@@ -338,10 +338,12 @@ function mkCard(e,sc,ai){
 }
 
 function bDir(fn,am){
+  var dirData=DATA.slice();
+  if(am){dirData.sort(function(a,b){var pa=a.entries.reduce(function(m,e){var ai=am[e.uni+'::'+a.dir];return ai&&!ai.isNo?Math.min(m,ai.p||99):m;},99);var pb=b.entries.reduce(function(m,e){var ai=am[e.uni+'::'+b.dir];return ai&&!ai.isNo?Math.min(m,ai.p||99):m;},99);return pa-pb;});}
   var h='';
-  for(var i=0;i<DATA.length;i++){
+  for(var i=0;i<dirData.length;i++){
 
-    var d=DATA[i];
+    var d=dirData[i];
     var ents=fn?d.entries.filter(fn):d.entries.slice();
     if(am){ents=d.entries.slice();ents.sort(function(a,b){var ka=a.uni+'::'+d.dir,kb=b.uni+'::'+d.dir;var da=am[ka]||null,db=am[kb]||null;var pa=da&&!da.isNo?da.p:50,pb=db&&!db.isNo?db.p:50;var na=da&&da.isNo?1:0,nb=db&&db.isNo?1:0;return(na-nb)||(pa-pb);});}
     if(!ents.length)continue;
