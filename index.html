@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Куратор — Университеты Германии</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e8e6de; font-size: 13px; padding: 1rem; }
+.toolbar { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
+.tab-group { display: flex; border: 0.5px solid #2a2a28; border-radius: 8px; overflow: hidden; }
+.tab { padding: 6px 12px; font-size: 12px; font-weight: 500; color: #888780; background: #1a1a18; cursor: pointer; border-right: 0.5px solid #2a2a28; white-space: nowrap; }
+.tab:last-child { border-right: none; }
+.tab.active { background: #222220; color: #e8e6de; }
+.search-wrap { display: flex; flex: 1; min-width: 200px; border: 0.5px solid #2a2a28; border-radius: 8px; overflow: hidden; background: #1a1a18; }
+.search-wrap input { flex: 1; padding: 6px 10px; font-size: 12px; border: none; background: transparent; color: #e8e6de; outline: none; min-width: 0; }
+.search-wrap input::placeholder { color: #555; }
+.ai-btn { padding: 5px 11px; font-size: 11px; font-weight: 500; color: #888; background: transparent; border: none; border-left: 0.5px solid #2a2a28; cursor: pointer; white-space: nowrap; transition: background .15s; }
+.ai-btn:hover { background: #222; }
+.ai-btn.active { background: #0c2a3a; color: #5bb3d0; }
+.send-btn { padding: 5px 10px; font-size: 13px; color: #888; background: transparent; border: none; border-left: 0.5px solid #2a2a28; cursor: pointer; display: none; align-items: center; }
+.send-btn:hover { background: #222; color: #e8e6de; }
+.send-btn.visible { display: flex; }
+.lang-group { display: flex; border: 0.5px solid #2a2a28; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+.lang-btn { padding: 5px 9px; font-size: 12px; color: #888; background: #1a1a18; cursor: pointer; border-right: 0.5px solid #2a2a28; }
+.lang-btn:last-child { border-right: none; }
+.lang-btn.active { background: #222; color: #e8e6de; }
+.hint { font-size: 11px; color: #555; padding: 0 0 10px; }
+.hint.ai-mode { color: #5bb3d0; }
+.filter-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+.ftag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 11px; background: #0c2a3a; color: #5bb3d0; border: 0.5px solid #1a4a5a; }
+.ftag-x { cursor: pointer; font-size: 13px; opacity: .7; }
+.ftag-x:hover { opacity: 1; }
+.ai-bar { padding: 9px 14px; background: #0c2a3a; border: 0.5px solid #1a4a5a; border-radius: 8px; margin-bottom: 10px; font-size: 12px; color: #5bb3d0; line-height: 1.6; display: none; }
+.view { display: none; }
+.view.active { display: block; }
+.sh { padding: 7px 12px; background: #1a1a18; border: 0.5px solid #2a2a28; border-radius: 8px; margin-bottom: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; user-select: none; }
+.sh:hover { background: #1e1e1c; }
+.st { font-size: 13px; font-weight: 500; color: #e8e6de; flex: 1; }
+.sm { font-size: 11px; color: #555; }
+.chev { font-size: 9px; color: #555; transition: transform .2s; }
+.chev.open { transform: rotate(180deg); }
+.sb { display: none; margin-bottom: 10px; }
+.sb.open { display: block; }
+.card { border: 0.5px solid #2a2a28; border-radius: 8px; margin-bottom: 6px; overflow: hidden; }
+.card.a1 { border-color: #1a5a2a; }
+.card.a2 { border-color: #5a4a10; }
+.card.ano { opacity: .4; }
+.ag { padding: 6px 12px; background: #0a2a15; font-size: 11px; color: #4a9a5a; border-bottom: 0.5px solid #1a4a2a; line-height: 1.5; }
+.aw { padding: 6px 12px; background: #2a1f05; font-size: 11px; color: #c8960a; border-top: 0.5px solid #4a3a10; line-height: 1.5; }
+.an { padding: 5px 12px 7px 36px; font-size: 11px; color: #c84a4a; }
+.ch { display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer; background: #1a1a18; user-select: none; }
+.ch:hover { background: #1e1e1c; }
+.cr { font-size: 10px; color: #555; min-width: 14px; font-weight: 500; }
+.ci { flex: 1; min-width: 0; }
+.cn { font-size: 12px; font-weight: 500; color: #e8e6de; }
+.cs { font-size: 11px; color: #888; margin-top: 1px; }
+.bgs { display: flex; gap: 4px; flex-wrap: wrap; flex-shrink: 0; }
+.bdg { display: inline-block; padding: 1px 6px; border-radius: 20px; font-size: 10px; font-weight: 500; white-space: nowrap; }
+.be { background: #0c2a3a; color: #5bb3d0; }
+.bt { background: #2a1f05; color: #c8960a; }
+.bs { background: #0a2a15; color: #4a9a5a; }
+.bhi { background: #2a0a0a; color: #c84a4a; }
+.bmd { background: #2a1f05; color: #c8960a; }
+.blo { background: #0a2a15; color: #4a9a5a; }
+.cb { display: none; padding: 10px 12px; border-top: 0.5px solid #2a2a28; background: #161614; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cb.open { display: grid; }
+.cl { font-size: 10px; font-weight: 500; color: #555; text-transform: uppercase; letter-spacing: .05em; margin: 8px 0 4px; }
+.cl:first-child { margin-top: 0; }
+.row { display: flex; gap: 5px; font-size: 11px; color: #888; line-height: 1.6; }
+.row::before { content: "—"; color: #444; flex-shrink: 0; }
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; border-radius: 20px; font-size: 10px; background: #222; color: #888; border: 0.5px solid #333; }
+.dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.empty { font-size: 12px; color: #555; padding: 24px; text-align: center; }
+.dots { display: inline-flex; gap: 3px; vertical-align: middle; }
+.dots span { width: 4px; height: 4px; border-radius: 50%; background: currentColor; animation: dp 1.2s infinite; }
+.dots span:nth-child(2) { animation-delay: .2s; }
+.dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes dp { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
+
+.admin-fab { position: fixed; right: 14px; bottom: 14px; width: 34px; height: 34px; border-radius: 999px; border: 0.5px solid #2a2a28; background: #1a1a18; color: #e8e6de; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 50; box-shadow: 0 8px 28px rgba(0,0,0,.35); }
+.admin-fab:hover { background: #222220; }
+.admin-panel { position: fixed; right: 14px; bottom: 58px; width: min(420px, calc(100vw - 28px)); max-height: calc(100vh - 80px); overflow: auto; z-index: 60; display: none; background: #131311; border: 0.5px solid #2a2a28; border-radius: 12px; box-shadow: 0 18px 50px rgba(0,0,0,.5); }
+.admin-panel.open { display: block; }
+.admin-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 12px 10px; border-bottom: 0.5px solid #2a2a28; }
+.admin-title { font-size: 13px; font-weight: 700; }
+.admin-close { border: none; background: transparent; color: #888; cursor: pointer; font-size: 18px; line-height: 1; }
+.admin-body { padding: 12px; }
+.admin-note { font-size: 11px; color: #666; margin-bottom: 10px; line-height: 1.4; }
+.admin-login, .admin-form { display: none; }
+.admin-login.open, .admin-form.open { display: block; }
+.admin-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.admin-input, .admin-select, .admin-textarea { width: 100%; border: 0.5px solid #2a2a28; background: #1a1a18; color: #e8e6de; border-radius: 8px; padding: 8px 10px; outline: none; font: inherit; font-size: 12px; }
+.admin-textarea { min-height: 68px; resize: vertical; }
+.admin-label { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: #666; margin: 10px 0 5px; }
+.admin-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.admin-btn { border: 0.5px solid #2a2a28; background: #1a1a18; color: #e8e6de; border-radius: 8px; padding: 8px 10px; font-size: 12px; cursor: pointer; }
+.admin-btn:hover { background: #222220; }
+.admin-btn.primary { background: #0c2a3a; border-color: #1a4a5a; color: #5bb3d0; }
+.admin-btn.primary:hover { background: #0f3244; }
+.admin-status { font-size: 11px; color: #888; margin-top: 10px; line-height: 1.4; }
+.admin-list { margin-top: 12px; border-top: 0.5px solid #2a2a28; padding-top: 10px; }
+.admin-item { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 0.5px solid #1f1f1d; font-size: 12px; }
+.admin-item:last-child { border-bottom: none; }
+.admin-item small { color: #666; display: block; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="tab-group">
+    <div class="tab active" onclick="swV('dir',this)">По направлениям</div>
+    <div class="tab" onclick="swV('city',this)">По городам</div>
+    <div class="tab" onclick="swV('uni',this)">По вузам</div>
+  </div>
+  <div class="search-wrap">
+    <input id="q" placeholder="Поиск... (медицина, 800 евро, хорошие шансы)" oninput="onIn(this.value)">
+    <button class="ai-btn" id="aibtn" onclick="togAI()">✦ AI</button>
+    <button class="send-btn" id="sbtn" onclick="sendAI()">↵</button>
+  </div>
+  <div class="lang-group">
+    <div class="lang-btn active" onclick="setL('ruku',this)">🇷🇺🇺🇦</div>
+    <div class="lang-btn" onclick="setL('deen',this)">🇩🇪🇬🇧</div>
+  </div>
+</div>
+<div class="filter-tags" id="ftags"></div>
+<div class="hint" id="hint">Пример: медицина 800 евро, хорошие шансы + Берлин</div>
+<div class="ai-bar" id="aibar"></div>
+<div id="vdir" class="view active"></div>
+<div id="vcity" class="view"></div>
+<div id="vuni" class="view"></div>
+
+<button class="admin-fab" id="adminFab" title="Админка">⚙</button>
+
+<div class="admin-panel" id="adminPanel">
+  <div class="admin-head">
+    <div class="admin-title">Админка</div>
+    <button class="admin-close" id="adminClose">×</button>
+  </div>
+  <div class="admin-body">
+    <div class="admin-note">Введи пароль. После входа можно добавлять университеты прямо в Supabase.</div>
+    <div class="admin-login open" id="adminLogin">
+      <div class="admin-label">Пароль</div>
+      <input class="admin-input" id="adminPass" type="password" placeholder="••••••••">
+      <div class="admin-actions">
+        <button class="admin-btn primary" id="adminLoginBtn">Войти</button>
+      </div>
+      <div class="admin-status" id="adminStatus"></div>
+    </div>
+
+    <div class="admin-form" id="adminForm">
+      <div class="admin-row">
+        <div>
+          <div class="admin-label">Направление</div>
+          <input class="admin-input" id="fDirection" placeholder="Computer Science / AI">
+        </div>
+        <div>
+          <div class="admin-label">Университет</div>
+          <input class="admin-input" id="fUni" placeholder="TU München">
+        </div>
+      </div>
+
+      <div class="admin-row">
+        <div>
+          <div class="admin-label">Город</div>
+          <input class="admin-input" id="fCity" placeholder="munich">
+        </div>
+        <div>
+          <div class="admin-label">Статус</div>
+          <select class="admin-select" id="fStatus">
+            <option value="e">Элитный (e)</option>
+            <option value="t">Технический (t)</option>
+            <option value="s">Сильный (s)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="admin-row">
+        <div>
+          <div class="admin-label">Шанс</div>
+          <select class="admin-select" id="fChance">
+            <option value="low">low</option>
+            <option value="mid">mid</option>
+            <option value="hi">hi</option>
+          </select>
+        </div>
+        <div>
+          <div class="admin-label">Есть англ. программа</div>
+          <select class="admin-select" id="fEng">
+            <option value="true">Да</option>
+            <option value="false">Нет</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="admin-label">Дедлайн</div>
+      <input class="admin-input" id="fDeadline" placeholder="WS: 15 июля">
+
+      <div class="admin-label">Документы (по строкам)</div>
+      <textarea class="admin-textarea" id="fDocs" placeholder="CV&#10;Motivation letter"></textarea>
+
+      <div class="admin-label">Особенности (по строкам)</div>
+      <textarea class="admin-textarea" id="fNotes" placeholder="uni-assist&#10;Вступительный тест"></textarea>
+
+      <div class="admin-row">
+        <div>
+          <div class="admin-label">Плюсы (по строкам)</div>
+          <textarea class="admin-textarea" id="fPros" placeholder="Топ-5&#10;Стажировки"></textarea>
+        </div>
+        <div>
+          <div class="admin-label">Минусы (по строкам)</div>
+          <textarea class="admin-textarea" id="fCons" placeholder="Дорого&#10;Конкурс"></textarea>
+        </div>
+      </div>
+
+      <div class="admin-label">Магистратура (по строкам)</div>
+      <textarea class="admin-textarea" id="fMaster" placeholder="Data Science&#10;Robotics"></textarea>
+
+      <div class="admin-label">Теги (через запятую)</div>
+      <input class="admin-input" id="fTags" placeholder="cs, ai, munich, elite">
+
+      <div class="admin-actions">
+        <button class="admin-btn primary" id="addUniBtn">Добавить университет</button>
+        <button class="admin-btn" id="refreshBtn">Обновить список</button>
+      </div>
+      <div class="admin-status" id="addStatus"></div>
+
+      <div class="admin-list" id="adminList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var G = { lang:'ruku', ai:false, timer:null, admin:false, loading:false };
+var HINTS = { ruku:'Пример: медицина 800 евро, хорошие шансы + Берлин', deen:'Beispiel: Medizin 800 Euro, gute Chancen, Berlin' };
+var AHINTS = { ruku:'✦ AI включён — опишите клиента и нажмите ↵', deen:'✦ AI on — describe client and press ↵' };
+var CCOST = { munich:1400,berlin:1200,heidelberg:950,bonn:900,tuebingen:750,dresden:750,karlsruhe:900,aachen:850,hamburg:1200,cologne:950,frankfurt:1300,freiburg:900 };
+var CITIES = {
+  munich:{n:'Мюнхен',l:'Bayern',c:'high',cl:'€€€'},berlin:{n:'Берлин',l:'Berlin',c:'high',cl:'€€€'},
+  heidelberg:{n:'Гейдельберг',l:'Baden-Württemberg',c:'mid',cl:'€€'},bonn:{n:'Бонн',l:'NRW',c:'mid',cl:'€€'},
+  tuebingen:{n:'Тюбинген',l:'Baden-Württemberg',c:'low',cl:'€'},dresden:{n:'Дрезден',l:'Sachsen',c:'low',cl:'€'},
+  karlsruhe:{n:'Карлсруэ',l:'Baden-Württemberg',c:'mid',cl:'€€'},aachen:{n:'Аахен',l:'NRW',c:'mid',cl:'€€'},
+  hamburg:{n:'Гамбург',l:'Hamburg',c:'high',cl:'€€€'},cologne:{n:'Кёльн',l:'NRW',c:'mid',cl:'€€'},
+  frankfurt:{n:'Франкфурт',l:'Hessen',c:'high',cl:'€€€'},freiburg:{n:'Фрайбург',l:'Baden-Württemberg',c:'mid',cl:'€€'}
+};
+var CC={high:'#c84a4a',mid:'#c8960a',low:'#4a9a5a'};
+var SL={e:'Элитный',t:'Технический',s:'Сильный'};
+var SC={e:'be',t:'bt',s:'bs'};
+var CHL={low:'Шансы: низкие',mid:'Шансы: средние',hi:'Шансы: высокие',high:'Шансы: высокие'};
+var CHC={low:'bhi',mid:'bmd',hi:'blo',high:'blo'};
+var SV={e:0,t:1,s:2};
+var CORD=['munich','berlin','heidelberg','bonn','tuebingen','karlsruhe','dresden','aachen','hamburg','cologne','frankfurt','freiburg'];
+var SUPABASE_URL = 'https://hbkltwkspfbnjoltfxby.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_LH9wJzvN8Img4roHKalcKQ_CiRxtp3d';
+var ADMIN_PASSWORD = 'Wawaza1226';
+
+let DATA = [];
+let ALL_ROWS = [];
+
+function safeArray(v) {
+  if (Array.isArray(v)) return v;
+  if (v == null) return [];
+  if (typeof v === 'string') {
+    try {
+      const p = JSON.parse(v);
+      if (Array.isArray(p)) return p;
+    } catch (e) {}
+    return v ? [v] : [];
+  }
+  return [String(v)];
+}
+
+function makeEntry(r, idx) {
+  return {
+    id: r.id ?? idx + 1,
+    rank: idx + 1,
+    uni: r.uni || '',
+    city: (r.city || '').toLowerCase(),
+    st: r.status || 's',
+    eng: !!r.eng,
+    ch: r.chance === 'high' ? 'hi' : (r.chance || 'mid'),
+    sub: r.direction || '',
+    dl: r.deadline || '',
+
+    lr: safeArray(r.language || []), // ✅ фикс
+
+    docs: safeArray(r.docs),
+    notes: safeArray(r.features || r.notes),
+
+    ms: safeArray(r.master || []), // ✅ фикс
+
+    pros: safeArray(r.pros),
+    cons: safeArray(r.cons),
+
+    tags: safeArray(r.tags || []).map(String)
+  };
+}
+  
+function transformRows(rows) {
+  const grouped = [];
+  const idxMap = new Map();
+  rows.forEach((r) => {
+    const dir = r.direction || 'Без направления';
+    if (!idxMap.has(dir)) {
+      idxMap.set(dir, grouped.length);
+      grouped.push({ dir, entries: [] });
+    }
+    const g = grouped[idxMap.get(dir)];
+    g.entries.push(makeEntry(r, g.entries.length));
+  });
+  return grouped;
+}
+
+async function loadData() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/universities?select=*`, {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    const rows = await res.json();
+    if (!res.ok) throw new Error(rows?.message || 'Ошибка загрузки Supabase');
+    ALL_ROWS = rows || [];
+    DATA = transformRows(ALL_ROWS);
+    rebuild(null, null);
+    if (G.admin) renderAdminList();
+  } catch (err) {
+    const hint = document.getElementById('hint');
+    hint.textContent = 'Ошибка загрузки базы: ' + (err.message || err);
+    hint.style.color = '#c84a4a';
+    document.getElementById('vdir').innerHTML = '<div class="empty">Не удалось загрузить данные</div>';
+    document.getElementById('vcity').innerHTML = '<div class="empty">Не удалось загрузить данные</div>';
+    document.getElementById('vuni').innerHTML = '<div class="empty">Не удалось загрузить данные</div>';
+  }
+}
+
+function parseQ(q){
+  var lo=q.toLowerCase();var filters=[];var budget=null;
+  var re=/(\d{3,5})\s*(?:евро|euro|eur|€)/gi,m;
+  while((m=re.exec(lo))!==null){var n=parseInt(m[1]);if(n>=300&&n<=5000){budget=n;filters.push({label:'≤'+n+'€/мес',type:'budget',value:n});}}
+  var cm=[{re:/хорош|высок.{0,10}шанс|низк.{0,10}конкурс|good chance|hohe chance|висок.{0,10}шанс/i,val:'hi',label:'Шансы: высокие'},{re:/средн.{0,10}шанс|medium chance/i,val:'mid',label:'Шансы: средние'},{re:/низк.{0,10}шанс|высок.{0,10}конкурс|low chance/i,val:'low',label:'Шансы: низкие'}];
+  for(var i=0;i<cm.length;i++){if(cm[i].re.test(lo)){filters.push({label:cm[i].label,type:'chance',value:cm[i].val});break;}}
+  var dm=[{re:/медицин|medicine|medizin/i,val:'medicine',label:'Медицина'},{re:/computer science|cs\b|информатик|інформатик|informatik/i,val:'cs',label:'CS'},{re:/machine learning|ml\b|нейросет/i,val:'ml',label:'ML'},{re:/\bai\b|искусств.{0,5}интелл/i,val:'ai',label:'AI'},{re:/машиностроен|инженер|maschinenbau|mechanical/i,val:'mechanical',label:'Машиностроение'},{re:/экономик|wirtschaft|economics/i,val:'economics',label:'Экономика'},{re:/финанс|finance/i,val:'finance',label:'Финансы'},{re:/биолог|biology/i,val:'biology',label:'Биология'},{re:/экологи|ecology/i,val:'ecology',label:'Экология'},{re:/право|law\b/i,val:'law',label:'Право'},{re:/физик|physics/i,val:'physics',label:'Физика'},{re:/математик|mathematics/i,val:'mathematics',label:'Математика'}];
+  for(var i=0;i<dm.length;i++){if(dm[i].re.test(lo))filters.push({label:dm[i].label,type:'tag',value:dm[i].value || dm[i].val});}
+  var ctm=[{re:/мюнхен|münchen|munich/i,val:'munich',label:'Мюнхен'},{re:/берлин|berlin/i,val:'berlin',label:'Берлин'},{re:/гейдельберг|heidelberg/i,val:'heidelberg',label:'Гейдельберг'},{re:/\bбонн\b|bonn/i,val:'bonn',label:'Бонн'},{re:/тюбинг|tuebingen/i,val:'tuebingen',label:'Тюбинген'},{re:/дрезден|dresden/i,val:'dresden',label:'Дрезден'},{re:/карлсруэ|karlsruhe/i,val:'karlsruhe',label:'Карлсруэ'},{re:/аахен|aachen/i,val:'aachen',label:'Аахен'},{re:/гамбург|hamburg/i,val:'hamburg',label:'Гамбург'},{re:/кёльн|кельн|cologne/i,val:'cologne',label:'Кёльн'},{re:/франкфурт|frankfurt/i,val:'frankfurt',label:'Франкфурт'},{re:/фрайбург|freiburg/i,val:'freiburg',label:'Фрайбург'}];
+  for(var i=0;i<ctm.length;i++){if(ctm[i].re.test(lo))filters.push({label:ctm[i].label,type:'city',value:ctm[i].value || ctm[i].val});}
+  if(/\bангл|\bengl|english/i.test(lo))filters.push({label:'Есть англ.',type:'eng',value:true});
+  if(/стипенд|scholarship/i.test(lo))filters.push({label:'Стипендия',type:'tag',value:'scholarship'});
+  return{filters:filters,budget:budget};
+}
+
+function applyF(e,filters,budget){
+  if(budget!==null&&(CCOST[e.city]||9999)>budget*1.15)return false;
+  for(var i=0;i<filters.length;i++){
+    var f=filters[i];
+    if(f.type==='budget')continue;
+    if(f.type==='chance'&&e.ch!==f.value)return false;
+    if(f.type==='tag'&&(e.tags||[]).indexOf(f.value)<0)return false;
+    if(f.type==='city'&&e.city!==f.value)return false;
+    if(f.type==='eng'&&!e.eng)return false;
+  }
+  return true;
+}
+
+var AF=[],AB=null;
+function renderTags(){var c=document.getElementById('ftags');if(!AF.length&&!AB){c.innerHTML='';return;}c.innerHTML=AF.map(function(f,i){return'<span class="ftag">'+f.label+' <span class="ftag-x" onclick="rmF('+i+')">×</span></span>';}).join('');}
+function rmF(i){AF.splice(i,1);AB=null;renderTags();doSearch();}
+function doSearch(){var q=document.getElementById('q').value.trim();if(!q){AF=[];AB=null;renderTags();rebuild(null,null);return;}var p=parseQ(q);AF=p.filters;AB=p.budget;renderTags();if(AF.length>0||AB!==null){rebuild(function(e){return applyF(e,AF,AB);},null);}else{rebuild(null,null);}}
+
+function rws(arr,col){return(arr||[]).map(function(x){return'<div class="row"'+(col?' style="color:'+col+'"':'')+'>'+x+'</div>';}).join('');}
+function mbd(arr){return(arr||[]).map(function(x){return'<span class="bdg" style="background:#222;color:#888;margin:2px 2px 0 0">'+x+'</span>';}).join('');}
+
+function mkCard(e,sc,ai){
+  var city=CITIES[e.city]||{n:e.city||'',c:'mid',cl:''};
+  var pill=sc?'<span class="pill"><span class="dot" style="background:'+CC[city.c]+'"></span>'+city.n+' '+city.cl+'</span>':'';
+  var eng=e.eng?'<span class="bdg blo">Есть англ.</span>':'<span class="bdg" style="background:#1a1a18;color:#555">Только нем.</span>';
+  var top=ai&&ai.reason?'<div class="ag">✓ '+ai.reason+'</div>':'';
+  var bot=ai&&ai.warning?'<div class="aw">⚠ '+ai.warning+'</div>':'';
+  var no=ai&&ai.noR?'<div class="an">✗ '+ai.noR+'</div>':'';
+  var cls=ai?(ai.isNo?'ano':ai.p===1?'a1':ai.p===2?'a2':''):'';
+  var lbl=e._d||e.sub||'';
+  return'<div class="card '+cls+'">'+top+'<div class="ch" onclick="togC(this)"><span class="cr">'+(e.rank||'·')+'</span><div class="ci"><div class="cn">'+e.uni+'</div><div class="cs">'+lbl+'</div></div><div class="bgs">'+pill+'<span class="bdg '+SC[e.st]+'">'+SL[e.st]+'</span>'+eng+'<span class="bdg '+CHC[e.ch]+'">'+CHL[e.ch]+'</span></div><span class="chev">▼</span></div><div class="cb"><div><div class="cl">Язык</div>'+rws(e.lr)+'<div class="cl">Документы</div>'+rws(e.docs)+'<div class="cl">Дедлайн</div><div class="row">'+e.dl+'</div></div><div><div class="cl">Особенности</div>'+rws(e.notes)+'<div class="cl">Плюсы</div>'+rws(e.pros,'#4a9a5a')+'<div class="cl">Минусы</div>'+rws(e.cons,'#c84a4a')+'<div class="cl">Магистратура</div><div style="margin-top:2px">'+mbd(e.ms)+'</div></div></div>'+bot+no+'</div>';
+}
+
+function bDir(fn,am){
+  var h='';
+  for(var i=0;i<DATA.length;i++){
+    var d=DATA[i];
+    var ents=fn?d.entries.filter(fn):d.entries.slice();
+    if(am){
+      ents=d.entries.slice();
+      ents.sort(function(a,b){
+        var ka=a.uni+'::'+d.dir,kb=b.uni+'::'+d.dir;
+        var da=am[ka]||null,db=am[kb]||null;
+        var pa=da&&!da.isNo?da.p:50,pb=db&&!db.isNo?db.p:50;
+        var na=da&&da.isNo?1:0,nb=db&&db.isNo?1:0;
+        return(na-nb)||(pa-pb);
+      });
+    }
+    if(!ents.length)continue;
+    var o=fn||am?'open':'';
+    var cnt=am?ents.filter(function(e){var k=e.uni+'::'+d.dir;return am[k]&&!am[k].isNo;}).length:ents.length;
+    var meta=am?cnt+' подходит':cnt+' вузов';
+    var cards=ents.map(function(e){var ai=am?(am[e.uni+'::'+d.dir]||null):null;return mkCard(Object.assign({},e,{_d:d.dir}),true,ai);}).join('');
+    h+='<div class="sh" onclick="togS(this)"><span class="st">'+d.dir+'</span><span class="sm">'+meta+'</span><span class="chev '+o+'">▼</span></div><div class="sb '+o+'">'+cards+'</div>';
+  }
+  document.getElementById('vdir').innerHTML=h||'<div class="empty">Ничего не найдено</div>';
+}
+function bCity(fn,am){
+  var bC={};
+  for(var i=0;i<DATA.length;i++){
+    for(var j=0;j<DATA[i].entries.length;j++){
+      var e=DATA[i].entries[j];
+      var ai=am?(am[e.uni+'::'+DATA[i].dir]||null):null;
+      if(fn&&!fn(e))continue;
+      if(am&&!ai)continue;
+      if(!bC[e.city])bC[e.city]=[];
+      bC[e.city].push({e:Object.assign({},e,{_d:DATA[i].dir}),ai:ai});
+    }
+  }
+  var h='';
+  for(var i=0;i<CORD.length;i++){
+    var cid=CORD[i];
+    if(!bC[cid]||!bC[cid].length)continue;
+    var city=CITIES[cid];
+    var sorted=bC[cid].slice().sort(function(a,b){if(am){var pa=a.ai&&!a.ai.isNo?a.ai.p:50,pb=b.ai&&!b.ai.isNo?b.ai.p:50;return pa-pb;}return SV[a.e.st]-SV[b.e.st];});
+    var o=fn||am?'open':'';
+    var cards=sorted.map(function(x,idx){return mkCard(Object.assign({},x.e,{rank:idx+1}),false,x.ai);}).join('');
+    h+='<div class="sh" onclick="togS(this)"><span class="st">'+city.n+'</span><span class="sm">'+city.l+' · <span style="color:'+CC[city.c]+'">'+city.cl+'</span></span><span class="chev '+o+'">▼</span></div><div class="sb '+o+'">'+cards+'</div>';
+  }
+  document.getElementById('vcity').innerHTML=h||'<div class="empty">Ничего не найдено</div>';
+}
+function bUni(fn,am){
+  var bU={};
+  for(var i=0;i<DATA.length;i++){
+    for(var j=0;j<DATA[i].entries.length;j++){
+      var e=DATA[i].entries[j];
+      var ai=am?(am[e.uni+'::'+DATA[i].dir]||null):null;
+      if(fn&&!fn(e))continue;
+      if(am&&!ai)continue;
+      if(!bU[e.uni]){bU[e.uni]=Object.assign({},e,{dirs:[],bAI:null});}
+      bU[e.uni].dirs.push(DATA[i].dir);
+      if(ai&&!ai.isNo&&(!bU[e.uni].bAI||bU[e.uni].bAI.isNo||(ai.p||99)<(bU[e.uni].bAI.p||99)))bU[e.uni].bAI=ai;
+      else if(ai&&ai.isNo&&!bU[e.uni].bAI)bU[e.uni].bAI=ai;
+    }
+  }
+  var vals=Object.keys(bU).map(function(k){return bU[k];});
+  vals.sort(function(a,b){if(am){var pa=a.bAI&&!a.bAI.isNo?a.bAI.p:50,pb=b.bAI&&!b.bAI.isNo?b.bAI.p:50;return pa-pb;}return (SV[a.st]??9)-(SV[b.st]??9)||((CITIES[a.city]||{n:a.city}).n.localeCompare((CITIES[b.city]||{n:b.city}).n));});
+  var h='';
+  for(var i=0;i<vals.length;i++){
+    var v=vals[i];
+    var city=CITIES[v.city]||{n:v.city,c:'mid',cl:''};
+    var dH=v.dirs.map(function(d){return'<span class="bdg" style="background:#222;color:#888;margin:2px 2px 0 0">'+d+'</span>';}).join('');
+    var eng=v.eng?'<span class="bdg blo">Есть англ.</span>':'<span class="bdg" style="background:#1a1a18;color:#555">Только нем.</span>';
+    var ai=v.bAI;
+    var top=ai&&ai.reason?'<div class="ag">✓ '+ai.reason+'</div>':'';
+    var bot=ai&&ai.warning?'<div class="aw">⚠ '+ai.warning+'</div>':'';
+    var no=ai&&ai.noR?'<div class="an">✗ '+ai.noR+'</div>':'';
+    var cls=ai?(ai.isNo?'ano':ai.p===1?'a1':ai.p===2?'a2':''):'';
+    h+='<div class="card '+cls+'">'+top+'<div class="ch" onclick="togC(this)"><span class="cr">'+(i+1)+'</span><div class="ci"><div class="cn">'+v.uni+'</div><div class="cs">'+city.n+' · <span style="color:'+CC[city.c]+'">'+city.cl+'</span></div></div><div class="bgs"><span class="bdg '+SC[v.st]+'">'+SL[v.st]+'</span>'+eng+'<span class="bdg '+CHC[v.ch]+'">'+CHL[v.ch]+'</span></div><span class="chev">▼</span></div><div class="cb"><div><div class="cl">Направления</div><div style="margin-bottom:6px">'+dH+'</div><div class="cl">Язык</div>'+rws(v.lr)+'<div class="cl">Документы</div>'+rws(v.docs)+'<div class="cl">Дедлайн</div><div class="row">'+v.dl+'</div></div><div><div class="cl">Особенности</div>'+rws(v.notes)+'<div class="cl">Плюсы</div>'+rws(v.pros,'#4a9a5a')+'<div class="cl">Минусы</div>'+rws(v.cons,'#c84a4a')+'<div class="cl">Магистратура</div><div style="margin-top:2px">'+mbd(v.ms)+'</div></div></div>'+bot+no+'</div>';
+  }
+  document.getElementById('vuni').innerHTML=h||'<div class="empty">Ничего не найдено</div>';
+}
+function rebuild(fn,am){bDir(fn,am);bCity(fn,am);bUni(fn,am);}
+function togS(h){var b=h.nextElementSibling,c=h.querySelector('.chev');var o=b.classList.toggle('open');if(c)c.classList.toggle('open',o);}
+function togC(h){var b=h.nextElementSibling;if(!b)return;var c=h.querySelector('.chev');var o=b.classList.toggle('open');if(c)c.classList.toggle('open',o);b.style.display=o?'grid':'none';}
+function swV(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});document.getElementById('v'+n).classList.add('active');}
+function setL(lang,el){G.lang=lang;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.remove('active');});el.classList.add('active');var h=document.getElementById('hint');h.textContent=G.ai?AHINTS[lang]:HINTS[lang];var q=document.getElementById('q').value;if(q.trim()&&!G.ai)doSearch();}
+function onIn(v){if(G.ai){clearTimeout(G.timer);return;}clearTimeout(G.timer);G.timer=setTimeout(function(){doSearch();},300);}
+function togAI(){G.ai=!G.ai;var btn=document.getElementById('aibtn'),sb=document.getElementById('sbtn'),h=document.getElementById('hint'),bar=document.getElementById('aibar'),inp=document.getElementById('q');if(G.ai){btn.classList.add('active');btn.textContent='✦ AI';sb.classList.add('visible');h.textContent=AHINTS[G.lang];h.className='hint ai-mode';inp.placeholder='Опишите клиента...';inp.focus();}else{btn.classList.remove('active');btn.textContent='✦ AI';sb.classList.remove('visible');h.textContent=HINTS[G.lang];h.className='hint';bar.style.display='none';inp.placeholder='Поиск... (медицина, 800 евро, хорошие шансы)';var q=inp.value;if(q.trim())doSearch();else rebuild(null,null);}}
+function sendAI(){var v=document.getElementById('q').value.trim();if(v.length>2)runAI(v);}
+
+async function runAI(query) {
+  var btn=document.getElementById('aibtn'), sb=document.getElementById('sbtn');
+  btn.innerHTML='<span class="dots"><span></span><span></span><span></span></span>';
+  sb.textContent='…'; sb.style.pointerEvents='none';
+
+  var cat = DATA.map(function(d){ return { dir:d.dir, entries:d.entries.map(function(e){ return { id:e.uni+'::'+d.dir, uni:e.uni, city:(CITIES[e.city]||{n:e.city}).n, status:SL[e.st], chance:CHL[e.ch], eng:e.eng, cost:(CITIES[e.city]||{cl:''}).cl, costNum:CCOST[e.city], tags:e.tags, pros:e.pros, cons:e.cons }; })}; });
+
+  var sys = 'Ты — куратор по поступлению в немецкие вузы.\nКАТАЛОГ: ' + JSON.stringify(cat) + '\nПодбери варианты под описание клиента.\nВерни ТОЛЬКО JSON без markdown:\n{"summary":"1-2 предложения","top":[{"id":"Вуз::Направление","p":1,"reason":"почему подходит","warning":"риск или null"}],"no":[{"id":"Вуз::Направление","reason":"почему не подходит"}]}\np: 1=отлично, 2=с оговорками, 3=возможный. Макс 6 в top, 2-3 в no.';
+
+  try {
+    var resp = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ system: sys, userMessage: query })
+    });
+    var data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    var raw = data.text || '';
+    var parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    var bar = document.getElementById('aibar');
+    if (parsed.summary) { bar.innerHTML = '<strong>Анализ:</strong> ' + parsed.summary; bar.style.display = 'block'; }
+    var am = {};
+    (parsed.top||[]).forEach(function(x){ am[x.id]={isNo:false,p:x.p,reason:x.reason,warning:x.warning||null}; });
+    (parsed.no||[]).forEach(function(x){ am[x.id]={isNo:true,p:99,noR:x.reason}; });
+    rebuild(null, am);
+  } catch(err) {
+    var bar = document.getElementById('aibar');
+    bar.textContent = 'Ошибка: ' + (err.message || 'попробуйте снова');
+    bar.style.display = 'block';
+  }
+  btn.classList.add('active'); btn.textContent = '✦ AI';
+  sb.textContent = '↵'; sb.style.pointerEvents = '';
+}
+
+function openAdmin(open) { document.getElementById('adminPanel').classList.toggle('open', !!open); }
+function showAdminForm() { document.getElementById('adminLogin').classList.remove('open'); document.getElementById('adminForm').classList.add('open'); document.getElementById('adminStatus').textContent = 'Доступ открыт.'; renderAdminList(); }
+function hideAdminForm() { document.getElementById('adminLogin').classList.add('open'); document.getElementById('adminForm').classList.remove('open'); document.getElementById('adminPass').value = ''; document.getElementById('adminStatus').textContent = ''; }
+function renderAdminList() {
+  const list = document.getElementById('adminList');
+  if (!G.admin) { list.innerHTML = ''; return; }
+  if (!ALL_ROWS.length) { list.innerHTML = '<div class="admin-note">В таблице пока нет строк.</div>'; return; }
+  list.innerHTML = ALL_ROWS.slice().sort((a,b) => (a.direction || '').localeCompare(b.direction || '') || (a.uni || '').localeCompare(b.uni || '')).map(row => `
+    <div class="admin-item">
+      <div>
+        <strong>${escapeHtml(row.uni || '')}</strong>
+        <small>${escapeHtml(row.direction || '')} · ${escapeHtml(row.city || '')}</small>
+      </div>
+    </div>
+  `).join('');
+}
+function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+function splitLines(v) { return String(v || '').split('\n').map(s => s.trim()).filter(Boolean); }
+async function addUni() {
+  const status = document.getElementById('addStatus');
+  const payload = {
+    direction: document.getElementById('fDirection').value.trim(),
+    uni: document.getElementById('fUni').value.trim(),
+    city: document.getElementById('fCity').value.trim().toLowerCase(),
+    status: document.getElementById('fStatus').value,
+    chance: document.getElementById('fChance').value,
+    eng: document.getElementById('fEng').value === 'true',
+    deadline: document.getElementById('fDeadline').value.trim(),
+    docs: splitLines(document.getElementById('fDocs').value),
+    features: splitLines(document.getElementById('fNotes').value),
+    notes: splitLines(document.getElementById('fNotes').value),
+    pros: splitLines(document.getElementById('fPros').value),
+    cons: splitLines(document.getElementById('fCons').value),
+    master: splitLines(document.getElementById('fMaster').value),
+    tags: String(document.getElementById('fTags').value || '').split(',').map(s => s.trim()).filter(Boolean)
+  };
+  if (!payload.direction || !payload.uni) { status.textContent = 'Заполни хотя бы направление и название вуза.'; status.style.color = '#c8960a'; return; }
+  try {
+    status.textContent = 'Сохраняю...'; status.style.color = '#888';
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/universities`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        Prefer: 'return=representation'
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.message || data?.error || 'Не удалось добавить запись');
+    status.textContent = 'Добавлено.'; status.style.color = '#4a9a5a';
+    document.getElementById('fUni').value = '';
+    document.getElementById('fCity').value = '';
+    document.getElementById('fDirection').value = '';
+    document.getElementById('fDeadline').value = '';
+    document.getElementById('fDocs').value = '';
+    document.getElementById('fNotes').value = '';
+    document.getElementById('fPros').value = '';
+    document.getElementById('fCons').value = '';
+    document.getElementById('fMaster').value = '';
+    document.getElementById('fTags').value = '';
+    await loadData();
+    renderAdminList();
+  } catch (err) {
+    status.textContent = 'Ошибка: ' + (err.message || err);
+    status.style.color = '#c84a4a';
+  }
+}
+
+document.getElementById('adminFab').addEventListener('click', function(){ document.getElementById('adminPanel').classList.toggle('open'); });
+document.getElementById('adminClose').addEventListener('click', function(){ openAdmin(false); });
+document.getElementById('adminLoginBtn').addEventListener('click', function(){ const pass = document.getElementById('adminPass').value; if (pass === ADMIN_PASSWORD) { G.admin = true; showAdminForm(); } else { document.getElementById('adminStatus').textContent = 'Неверный пароль'; document.getElementById('adminStatus').style.color = '#c84a4a'; } });
+document.getElementById('addUniBtn').addEventListener('click', addUni);
+document.getElementById('refreshBtn').addEventListener('click', function(){ loadData(); });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') openAdmin(false); });
+
+loadData();
+rebuild(null, null);
+</script>
+</body>
+</html>
