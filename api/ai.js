@@ -31,8 +31,10 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'userMessage пустой' });
   }
 
-  try {
-    const geminiResp = await fetch(
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  const callGemini = async () => {
+    return fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`,
       {
         method: 'POST',
@@ -51,10 +53,31 @@ export default async function handler(req, res) {
         })
       }
     );
+  };
 
-    const geminiData = await geminiResp.json().catch(() => null);
+  try {
+    let geminiResp;
+    let geminiData;
+
+    // Retry up to 2 times on 429 with exponential backoff
+    for (let attempt = 0; attempt <= 2; attempt++) {
+      geminiResp = await callGemini();
+      geminiData = await geminiResp.json().catch(() => null);
+
+      if (geminiResp.status !== 429) break;
+
+      if (attempt < 2) {
+        await sleep(2000 * Math.pow(2, attempt)); // 2s, 4s
+      }
+    }
 
     if (!geminiResp.ok) {
+      if (geminiResp.status === 429) {
+        return res.status(429).json({
+          error: 'Лимит запросов к AI исчерпан. Попробуйте через несколько минут.',
+          isQuotaError: true
+        });
+      }
       const msg = geminiData?.error?.message || ('Gemini статус ' + geminiResp.status);
       return res.status(500).json({ error: msg });
     }
