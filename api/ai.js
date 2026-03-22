@@ -13,25 +13,27 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'GEMINI_API_KEY не настроен в переменных окружения Vercel' });
+    return res.status(500).json({ error: 'GEMINI_API_KEY не настроен' });
   }
 
-  let body = {};
+  let system = '';
+  let userMessage = '';
+
   try {
-    body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-  } catch {
-    return res.status(400).json({ error: 'Неверный JSON в теле запроса' });
+    const body = req.body || {};
+    system = body.system || '';
+    userMessage = body.userMessage || '';
+  } catch (e) {
+    return res.status(400).json({ error: 'Ошибка чтения тела запроса' });
   }
-
-  const { system = '', userMessage = '' } = body;
 
   if (!userMessage.trim()) {
-    return res.status(400).json({ error: 'userMessage не может быть пустым' });
+    return res.status(400).json({ error: 'userMessage пустой' });
   }
 
   try {
     const geminiResp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -53,8 +55,8 @@ export default async function handler(req, res) {
     const geminiData = await geminiResp.json().catch(() => null);
 
     if (!geminiResp.ok) {
-      const msg = geminiData?.error?.message || ('Gemini вернул статус ' + geminiResp.status);
-      return res.status(geminiResp.status).json({ error: msg });
+      const msg = geminiData?.error?.message || ('Gemini статус ' + geminiResp.status);
+      return res.status(500).json({ error: msg });
     }
 
     const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
@@ -63,10 +65,7 @@ export default async function handler(req, res) {
     const last  = rawText.lastIndexOf('}');
 
     if (first === -1 || last === -1 || last <= first) {
-      return res.status(500).json({
-        error: 'Gemini вернул ответ без JSON',
-        raw: rawText.slice(0, 300)
-      });
+      return res.status(500).json({ error: 'Gemini не вернул JSON', raw: rawText.slice(0, 300) });
     }
 
     const jsonText = rawText.slice(first, last + 1);
@@ -74,15 +73,18 @@ export default async function handler(req, res) {
     try {
       JSON.parse(jsonText);
     } catch {
-      return res.status(500).json({
-        error: 'Gemini вернул невалидный JSON',
-        raw: jsonText.slice(0, 300)
-      });
+      return res.status(500).json({ error: 'Невалидный JSON от Gemini', raw: jsonText.slice(0, 300) });
     }
 
     return res.status(200).json({ text: jsonText });
 
   } catch (err) {
-    return res.status(500).json({ error: err.message || 'Внутренняя ошибка сервера' });
+    return res.status(500).json({ error: err.message || 'Ошибка сервера' });
   }
 }
+
+export const config = {
+  api: {
+    bodyParser: true,
+  },
+};
