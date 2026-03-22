@@ -11,9 +11,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'GEMINI_API_KEY не настроен' });
+    return res.status(500).json({ error: 'ANTHROPIC_API_KEY не настроен' });
   }
 
   let system = '';
@@ -33,62 +33,59 @@ export default async function handler(req, res) {
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  const callGemini = async () => {
-    return fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: system + '\n\nЗапрос клиента: ' + userMessage }]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.2,
-            maxOutputTokens: 2000
-          }
-        })
-      }
-    );
+  const callClaude = async () => {
+    return fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-6',
+        max_tokens: 2000,
+        system: system,
+        messages: [
+          { role: 'user', content: userMessage }
+        ]
+      })
+    });
   };
 
   try {
-    let geminiResp;
-    let geminiData;
+    let claudeResp;
+    let claudeData;
 
     // Retry up to 2 times on 429 with exponential backoff
     for (let attempt = 0; attempt <= 2; attempt++) {
-      geminiResp = await callGemini();
-      geminiData = await geminiResp.json().catch(() => null);
+      claudeResp = await callClaude();
+      claudeData = await claudeResp.json().catch(() => null);
 
-      if (geminiResp.status !== 429) break;
+      if (claudeResp.status !== 429) break;
 
       if (attempt < 2) {
         await sleep(2000 * Math.pow(2, attempt)); // 2s, 4s
       }
     }
 
-    if (!geminiResp.ok) {
-      if (geminiResp.status === 429) {
+    if (!claudeResp.ok) {
+      if (claudeResp.status === 429) {
         return res.status(429).json({
           error: 'Лимит запросов к AI исчерпан. Попробуйте через несколько минут.',
           isQuotaError: true
         });
       }
-      const msg = geminiData?.error?.message || ('Gemini статус ' + geminiResp.status);
+      const msg = claudeData?.error?.message || ('Claude статус ' + claudeResp.status);
       return res.status(500).json({ error: msg });
     }
 
-    const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const rawText = claudeData?.content?.[0]?.text || '';
 
     const first = rawText.indexOf('{');
     const last  = rawText.lastIndexOf('}');
 
     if (first === -1 || last === -1 || last <= first) {
-      return res.status(500).json({ error: 'Gemini не вернул JSON', raw: rawText.slice(0, 300) });
+      return res.status(500).json({ error: 'Claude не вернул JSON', raw: rawText.slice(0, 300) });
     }
 
     const jsonText = rawText.slice(first, last + 1);
@@ -96,7 +93,7 @@ export default async function handler(req, res) {
     try {
       JSON.parse(jsonText);
     } catch {
-      return res.status(500).json({ error: 'Невалидный JSON от Gemini', raw: jsonText.slice(0, 300) });
+      return res.status(500).json({ error: 'Невалидный JSON от Claude', raw: jsonText.slice(0, 300) });
     }
 
     return res.status(200).json({ text: jsonText });
