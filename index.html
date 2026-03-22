@@ -472,30 +472,38 @@ function togAI(){G.ai=!G.ai;var btn=document.getElementById('aibtn'),sb=document
 function sendAI(){var v=document.getElementById('q').value.trim();if(v.length>2)runAI(v);}
 
 async function runAI(query) {
-  var btn = document.getElementById('aibtn');
-  var sb  = document.getElementById('sbtn');
-  var bar = document.getElementById('aibar');
-  btn.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
-  sb.textContent = '…'; sb.style.pointerEvents = 'none';
-  bar.style.display = 'none';
+  var btn=document.getElementById('aibtn'), sb=document.getElementById('sbtn');
+  btn.innerHTML='<span class="dots"><span></span><span></span><span></span></span>';
+  sb.textContent='…'; sb.style.pointerEvents='none';
 
-  var cat = DATA.map(function(d) {
-    return {
-      dir: d.dir,
-      entries: d.entries.map(function(e) {
-        return {
-          id:     e.uni + '::' + d.dir,
-          uni:    e.uni,
-          city:   e.city,
-          cost:   CCOST[e.city] || 999,
-          status: e.st,
-          chance: e.ch,
-          eng:    !!e.eng,
-          tags:   (e.tags || []).slice(0, 6)
-        };
-      })
-    };
-  });
+  var cat = DATA.map(function(d){ return { dir:d.dir, entries:d.entries.map(function(e){ return { id:e.uni+'::'+d.dir, uni:e.uni, city:(CITIES[e.city]||{n:e.city}).n, status:SL[e.st], chance:CHL[e.ch], eng:e.eng, cost:(CITIES[e.city]||{cl:''}).cl, costNum:CCOST[e.city], tags:e.tags, pros:e.pros, cons:e.cons }; })}; });
+
+  var sys = 'Ты — куратор по поступлению в немецкие вузы.\nКАТАЛОГ: ' + JSON.stringify(cat) + '\nПодбери варианты под описание клиента.\nВерни ТОЛЬКО JSON без markdown:\n{"summary":"1-2 предложения","top":[{"id":"Вуз::Направление","p":1,"reason":"почему подходит","warning":"риск или null"}],"no":[{"id":"Вуз::Направление","reason":"почему не подходит"}]}\np: 1=отлично, 2=с оговорками, 3=возможный. Макс 6 в top, 2-3 в no.';
+
+  try {
+    var resp = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ system: sys, userMessage: query })
+    });
+    var data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    var raw = data.text || '';
+    var parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    var bar = document.getElementById('aibar');
+    if (parsed.summary) { bar.innerHTML = '<strong>Анализ:</strong> ' + parsed.summary; bar.style.display = 'block'; }
+    var am = {};
+    (parsed.top||[]).forEach(function(x){ am[x.id]={isNo:false,p:x.p,reason:x.reason,warning:x.warning||null}; });
+    (parsed.no||[]).forEach(function(x){ am[x.id]={isNo:true,p:99,noR:x.reason}; });
+    rebuild(null, am);
+  } catch(err) {
+    var bar = document.getElementById('aibar');
+    bar.textContent = 'Ошибка: ' + (err.message || 'попробуйте снова');
+    bar.style.display = 'block';
+  }
+  btn.classList.add('active'); btn.textContent = '✦ AI';
+  sb.textContent = '↵'; sb.style.pointerEvents = '';
+}
 
   var sys =
     'Ты — куратор по поступлению в немецкие вузы. ' +
