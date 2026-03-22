@@ -77,24 +77,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .dots span:nth-child(2) { animation-delay: .2s; }
 .dots span:nth-child(3) { animation-delay: .4s; }
 @keyframes dp { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
-.de-tabs { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
-.de-tab { padding:5px 14px; font-size:12px; font-weight:500; color:#888; background:#1a1a18; border:0.5px solid #2a2a28; border-radius:8px; cursor:pointer; }
-.de-tab.active { background:#0c2a3a; color:#5bb3d0; border-color:#1a4a5a; }
-.de-section { display:none; }
-.de-section.active { display:block; }
-.de-card { background:#1a1a18; border:0.5px solid #2a2a28; border-radius:10px; padding:14px; margin-bottom:10px; }
-.de-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
-.de-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:10px; }
-.de-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px; }
-.de-item { display:flex; gap:5px; font-size:12px; color:#888; line-height:1.8; }
-.de-item::before { content:"—"; color:#444; flex-shrink:0; }
-.de-city-card { background:#131311; border:0.5px solid #2a2a28; border-radius:8px; padding:10px; }
-.de-city-name { font-size:12px; font-weight:500; color:#e8e6de; margin-bottom:2px; }
-.de-city-land { font-size:11px; color:#555; margin-bottom:6px; }
-.de-city-cost { display:flex; align-items:center; gap:5px; font-size:12px; font-weight:500; }
-.de-stip-card { background:#0a1a0a; border:0.5px solid #1a4a2a; border-radius:8px; padding:10px; }
-.de-stip-name { font-size:12px; font-weight:500; color:#4a9a5a; margin-bottom:4px; }
-.de-stip-desc { font-size:11px; color:#666; line-height:1.5; }
 .admin-fab { position: fixed; right: 14px; bottom: 14px; width: 34px; height: 34px; border-radius: 999px; border: 0.5px solid #2a2a28; background: #1a1a18; color: #e8e6de; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 50; box-shadow: 0 8px 28px rgba(0,0,0,.35); }
 .admin-fab:hover { background: #222220; }
 .admin-panel { position: fixed; right: 14px; bottom: 58px; width: min(420px, calc(100vw - 28px)); max-height: calc(100vh - 80px); overflow: auto; z-index: 60; display: none; background: #131311; border: 0.5px solid #2a2a28; border-radius: 12px; box-shadow: 0 18px 50px rgba(0,0,0,.5); }
@@ -120,19 +102,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .admin-item { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 0.5px solid #1f1f1d; font-size: 12px; }
 .admin-item:last-child { border-bottom: none; }
 .admin-item small { color: #666; display: block; margin-top: 2px; }
-.buni { background:#1a2a3a; color:#5bb3d0; }
-.bfh  { background:#1a2a1a; color:#4a9a5a; }
-.bart { background:#2a1a2a; color:#c86ad0; }
-.country-bar { display:flex; gap:5px; margin-bottom:10px; flex-wrap:wrap; align-items:center; }
-.country-btn { display:inline-flex; align-items:center; gap:5px; padding:4px 11px; font-size:12px; font-weight:500; color:#888; background:#1a1a18; border:0.5px solid #2a2a28; border-radius:20px; cursor:pointer; user-select:none; transition:background .15s,color .15s; }
-.country-btn span { font-size:11px; }
-.country-btn:hover:not(.soon) { background:#222; color:#e8e6de; }
-.country-btn.active { background:#1a1a18; color:#e8e6de; border-color:#3a3a38; font-weight:600; }
-.country-btn.soon { opacity:.4; cursor:default; }
-.type-bar { display:flex; gap:5px; margin-bottom:10px; flex-wrap:wrap; }
-.type-btn { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; font-size:11px; font-weight:500; color:#666; background:#1a1a18; border:0.5px solid #2a2a28; border-radius:20px; cursor:pointer; transition:background .15s,color .15s; }
-.type-btn:hover { background:#222; color:#e8e6de; }
-.type-btn.active { background:#222; color:#e8e6de; border-color:#3a3a38; }
 </style>
 </head>
 <body>
@@ -153,41 +122,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="lang-btn" onclick="setL('deen',this)">🇩🇪🇬🇧</div>
   </div>
 </div>
-<div class="country-bar">
-  <div class="country-btn active" onclick="swCountry('de',this)">🇩🇪 <span>Германия</span></div>
-  <div class="country-btn soon">🇦🇹 <span>Австрия — скоро</span></div>
-  <div class="country-btn soon">🇵🇱 <span>Польша — скоро</span></div>
-</div>
-<div class="type-bar">
-  <div class="type-btn active" onclick="swType('all',this)">Все</div>
-  <div class="type-btn" onclick="swType('uni',this)">🎓 Universität</div>
-  <div class="type-btn" onclick="swType('fh',this)">🏭 Fachhochschule</div>
-  <div class="type-btn" onclick="swType('art',this)">🎨 Kunsthochschule</div>
-</div>
-<div id="country-at-placeholder" class="country-ph" style="display:none">
-  <div style="padding:48px 0;text-align:center;color:#555;font-size:13px">
-    <div style="font-size:36px;margin-bottom:12px">🇦🇹</div>
-    <div style="font-weight:500;color:#888;margin-bottom:8px;font-size:15px">Австрия — скоро</div>
-    <div>Венский университет, TU Wien, Universität Graz и другие</div>
-  </div>
-</div>
-<div id="country-pl-placeholder" class="country-ph" style="display:none">
-  <div style="padding:48px 0;text-align:center;color:#555;font-size:13px">
-    <div style="font-size:36px;margin-bottom:12px">🇵🇱</div>
-    <div style="font-weight:500;color:#888;margin-bottom:8px;font-size:15px">Польша — скоро</div>
-    <div>Варшавский университет, AGH, Politechnika Wrocławska и другие</div>
-  </div>
-</div>
-<div id="main-content">
 <div class="filter-tags" id="ftags"></div>
 <div class="hint" id="hint">Пример: медицина 800 евро, хорошие шансы + Берлин</div>
 <div class="ai-bar" id="aibar"></div>
 <div id="vdir" class="view active"></div>
 <div id="vcity" class="view"></div>
 <div id="vuni" class="view"></div>
-<div id="vde" class="view"></div>
 
-</div>
 <button class="admin-fab" id="adminFab" title="Админка">⚙</button>
 
 <div class="admin-panel" id="adminPanel">
@@ -263,19 +204,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 var G = { lang:'ruku', ai:false, timer:null, admin:false };
 var HINTS = { ruku:'Пример: медицина 800 евро, хорошие шансы + Берлин', deen:'Beispiel: Medizin 800 Euro, gute Chancen, Berlin' };
 var AHINTS = { ruku:'✦ AI включён — опишите клиента и нажмите ↵', deen:'✦ AI on — describe client and press ↵' };
-var CCOST = { munich:1400,berlin:1200,heidelberg:950,bonn:900,tuebingen:750,dresden:750,karlsruhe:900,aachen:850,hamburg:1200,cologne:950,frankfurt:1300,freiburg:900,stuttgart:1050,duesseldorf:1150,leipzig:750,munster:900,hannover:950,mannheim:900,koblenz:850,nuremberg:950,darmstadt:950,passau:750 };
+var CCOST = { munich:1400,berlin:1200,heidelberg:950,bonn:900,tuebingen:750,dresden:750,karlsruhe:900,aachen:850,hamburg:1200,cologne:950,frankfurt:1300,freiburg:900 };
 var CITIES = {
   munich:{n:'Мюнхен',l:'Bayern',c:'high',cl:'€€€'},berlin:{n:'Берлин',l:'Berlin',c:'high',cl:'€€€'},
-  hamburg:{n:'Гамбург',l:'Hamburg',c:'high',cl:'€€€'},frankfurt:{n:'Франкфурт',l:'Hessen',c:'high',cl:'€€€'},
-  cologne:{n:'Кёльн',l:'NRW',c:'mid',cl:'€€'},stuttgart:{n:'Штутгарт',l:'Baden-Württemberg',c:'mid',cl:'€€'},
-  duesseldorf:{n:'Дюссельдорф',l:'NRW',c:'high',cl:'€€€'},aachen:{n:'Аахен',l:'NRW',c:'mid',cl:'€€'},
-  heidelberg:{n:'Гейдельберг',l:'Baden-Württemberg',c:'mid',cl:'€€'},mannheim:{n:'Мангейм',l:'Baden-Württemberg',c:'mid',cl:'€€'},
-  bonn:{n:'Бонн',l:'NRW',c:'mid',cl:'€€'},karlsruhe:{n:'Карлсруэ',l:'Baden-Württemberg',c:'mid',cl:'€€'},
-  munster:{n:'Мюнстер',l:'NRW',c:'mid',cl:'€€'},hannover:{n:'Ганновер',l:'Niedersachsen',c:'mid',cl:'€€'},
-  tuebingen:{n:'Тюбинген',l:'Baden-Württemberg',c:'low',cl:'€'},freiburg:{n:'Фрайбург',l:'Baden-Württemberg',c:'mid',cl:'€€'},
-  dresden:{n:'Дрезден',l:'Sachsen',c:'low',cl:'€'},leipzig:{n:'Лейпциг',l:'Sachsen',c:'low',cl:'€'},
-  nuremberg:{n:'Нюрнберг',l:'Bayern',c:'mid',cl:'€€'},darmstadt:{n:'Дармштадт',l:'Hessen',c:'mid',cl:'€€'},
-  koblenz:{n:'Кобленц',l:'Rheinland-Pfalz',c:'low',cl:'€'},passau:{n:'Пассау',l:'Bayern',c:'low',cl:'€'}
+  heidelberg:{n:'Гейдельберг',l:'Baden-Württemberg',c:'mid',cl:'€€'},bonn:{n:'Бонн',l:'NRW',c:'mid',cl:'€€'},
+  tuebingen:{n:'Тюбинген',l:'Baden-Württemberg',c:'low',cl:'€'},dresden:{n:'Дрезден',l:'Sachsen',c:'low',cl:'€'},
+  karlsruhe:{n:'Карлсруэ',l:'Baden-Württemberg',c:'mid',cl:'€€'},aachen:{n:'Аахен',l:'NRW',c:'mid',cl:'€€'},
+  hamburg:{n:'Гамбург',l:'Hamburg',c:'high',cl:'€€€'},cologne:{n:'Кёльн',l:'NRW',c:'mid',cl:'€€'},
+  frankfurt:{n:'Франкфурт',l:'Hessen',c:'high',cl:'€€€'},freiburg:{n:'Фрайбург',l:'Baden-Württemberg',c:'mid',cl:'€€'}
 };
 var CC={high:'#c84a4a',mid:'#c8960a',low:'#4a9a5a'};
 var SL={e:'Элитный',t:'Технический',s:'Сильный'};
@@ -283,7 +219,7 @@ var SC={e:'be',t:'bt',s:'bs'};
 var CHL={low:'Шансы: низкие',mid:'Шансы: средние',hi:'Шансы: высокие',high:'Шансы: высокие'};
 var CHC={low:'bhi',mid:'bmd',hi:'blo',high:'blo'};
 var SV={e:0,t:1,s:2};
-var CORD=['munich','berlin','hamburg','frankfurt','cologne','stuttgart','duesseldorf','aachen','heidelberg','mannheim','bonn','karlsruhe','munster','hannover','tuebingen','freiburg','dresden','leipzig','nuremberg','darmstadt','koblenz','passau'];
+var CORD=['munich','berlin','heidelberg','bonn','tuebingen','karlsruhe','dresden','aachen','hamburg','cologne','frankfurt','freiburg'];
 var SUPABASE_URL = 'https://hbkltwkspfbnjoltfxby.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_LH9wJzvN8Img4roHKalcKQ_CiRxtp3d';
 var ADMIN_PASSWORD = 'Wawaza1226';
@@ -308,7 +244,6 @@ function makeEntry(r, idx) {
     uni:   r.uni || '',
     city:  (r.city || '').toLowerCase(),
     st:    r.status || 's',
-    utype: r.type || 'uni',
     eng:   !!r.eng,
     ch:    r.chance === 'high' ? 'hi' : (r.chance || 'mid'),
     sub:   r.direction || '',
@@ -385,7 +320,7 @@ function applyF(e,filters,budget) {
 var AF=[], AB=null;
 function renderTags(){var c=document.getElementById('ftags');if(!AF.length&&!AB){c.innerHTML='';return;}c.innerHTML=AF.map(function(f,i){return'<span class="ftag">'+f.label+' <span class="ftag-x" onclick="rmF('+i+')">×</span></span>';}).join('');}
 function rmF(i){AF.splice(i,1);AB=null;renderTags();doSearch();}
-function doSearch(){var q=document.getElementById('q').value.trim();if(!q){AF=[];AB=null;renderTags();rebuild(function(e){return applyTypeFilter(e);},null);return;}var p=parseQ(q);AF=p.filters;AB=p.budget;renderTags();if(AF.length>0||AB!==null){rebuild(function(e){return applyF(e,AF,AB)&&applyTypeFilter(e);},null);}else{rebuild(function(e){return applyTypeFilter(e);},null);}}
+function doSearch(){var q=document.getElementById('q').value.trim();if(!q){AF=[];AB=null;renderTags();rebuild(null,null);return;}var p=parseQ(q);AF=p.filters;AB=p.budget;renderTags();if(AF.length>0||AB!==null){rebuild(function(e){return applyF(e,AF,AB);},null);}else{rebuild(null,null);}}
 
 function rws(arr,col){return(arr||[]).map(function(x){return'<div class="row"'+(col?' style="color:'+col+'"':'')+'>'+x+'</div>';}).join('');}
 function mbd(arr){return(arr||[]).map(function(x){return'<span class="bdg" style="background:#222;color:#888;margin:2px 2px 0 0">'+x+'</span>';}).join('');}
@@ -394,15 +329,12 @@ function mkCard(e,sc,ai){
   var city=CITIES[e.city]||{n:e.city||'',c:'mid',cl:''};
   var pill=sc?'<span class="pill"><span class="dot" style="background:'+CC[city.c]+'"></span>'+city.n+' '+city.cl+'</span>':'';
   var eng=e.eng?'<span class="bdg blo">Есть англ.</span>':'<span class="bdg" style="background:#1a1a18;color:#555">Только нем.</span>';
-  var TLABEL={'uni':'Uni','fh':'FH','art':'Kunst'};
-  var TCLS={'uni':'buni','fh':'bfh','art':'bart'};
-  var tbdg=e.utype?'<span class="bdg '+(TCLS[e.utype]||'buni')+'">'+(TLABEL[e.utype]||'Uni')+'</span>':'';
   var top=ai&&ai.reason?'<div class="ag">✓ '+ai.reason+'</div>':'';
   var bot=ai&&ai.warning?'<div class="aw">⚠ '+ai.warning+'</div>':'';
   var no=ai&&ai.noR?'<div class="an">✗ '+ai.noR+'</div>':'';
   var cls=ai?(ai.isNo?'ano':ai.p===1?'a1':ai.p===2?'a2':''):'';
   var lbl=e._d||e.sub||'';
-  return'<div class="card '+cls+'">'+top+'<div class="ch" onclick="togC(this)"><span class="cr">'+(e.rank||'·')+'</span><div class="ci"><div class="cn">'+e.uni+'</div><div class="cs">'+lbl+'</div></div><div class="bgs">'+pill+tbdg+'<span class="bdg '+SC[e.st]+'">'+SL[e.st]+'</span>'+eng+'<span class="bdg '+CHC[e.ch]+'">'+CHL[e.ch]+'</span></div><span class="chev">▼</span></div><div class="cb"><div><div class="cl">Язык</div>'+rws(e.lr)+'<div class="cl">Документы</div>'+rws(e.docs)+'<div class="cl">Дедлайн</div><div class="row">'+e.dl+'</div></div><div><div class="cl">Особенности</div>'+rws(e.notes)+'<div class="cl">Плюсы</div>'+rws(e.pros,'#4a9a5a')+'<div class="cl">Минусы</div>'+rws(e.cons,'#c84a4a')+'<div class="cl">Магистратура</div><div style="margin-top:2px">'+mbd(e.ms)+'</div></div></div>'+bot+no+'</div>';
+  return'<div class="card '+cls+'">'+top+'<div class="ch" onclick="togC(this)"><span class="cr">'+(e.rank||'·')+'</span><div class="ci"><div class="cn">'+e.uni+'</div><div class="cs">'+lbl+'</div></div><div class="bgs">'+pill+'<span class="bdg '+SC[e.st]+'">'+SL[e.st]+'</span>'+eng+'<span class="bdg '+CHC[e.ch]+'">'+CHL[e.ch]+'</span></div><span class="chev">▼</span></div><div class="cb"><div><div class="cl">Язык</div>'+rws(e.lr)+'<div class="cl">Документы</div>'+rws(e.docs)+'<div class="cl">Дедлайн</div><div class="row">'+e.dl+'</div></div><div><div class="cl">Особенности</div>'+rws(e.notes)+'<div class="cl">Плюсы</div>'+rws(e.pros,'#4a9a5a')+'<div class="cl">Минусы</div>'+rws(e.cons,'#c84a4a')+'<div class="cl">Магистратура</div><div style="margin-top:2px">'+mbd(e.ms)+'</div></div></div>'+bot+no+'</div>';
 }
 
 function bDir(fn,am){
@@ -442,151 +374,7 @@ function bUni(fn,am){
 function rebuild(fn,am){bDir(fn,am);bCity(fn,am);bUni(fn,am);}
 function togS(h){var b=h.nextElementSibling,c=h.querySelector('.chev');var o=b.classList.toggle('open');if(c)c.classList.toggle('open',o);}
 function togC(h){var b=h.nextElementSibling;if(!b)return;var c=h.querySelector('.chev');var o=b.classList.toggle('open');if(c)c.classList.toggle('open',o);b.style.display=o?'grid':'none';}
-function swV(n,el){
-  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
-  el.classList.add('active');
-  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
-  document.getElementById('v'+n).classList.add('active');
-  if(n==='de') buildDE();
-}
-function swDE(n,el){
-  document.querySelectorAll('.de-tab').forEach(function(t){t.classList.remove('active');});
-  el.classList.add('active');
-  document.querySelectorAll('.de-section').forEach(function(s){s.classList.remove('active');});
-  document.getElementById('des-'+n).classList.add('active');
-}
-function buildDE(){
-  var el=document.getElementById('vde');
-  if(el.dataset.built) return;
-  el.dataset.built='1';
-  var cityRows=Object.entries(CITIES).map(function(e){
-    var cid=e[0],cv=e[1];
-    var cost=CCOST[cid]||900;
-    var col=cost>=1200?'#c84a4a':cost>=900?'#c8960a':'#4a9a5a';
-    return '<div class="de-city-card"><div class="de-city-name">'+cv.n+'</div><div class="de-city-land">'+cv.l+'</div><div class="de-city-cost"><span style="width:8px;height:8px;border-radius:50%;background:'+col+';display:inline-block"></span><span style="color:'+col+'">~'+cost+'€/мес</span><span style="color:#555;font-size:10px;margin-left:4px">'+cv.cl+'</span></div></div>';
-  }).join('');
-  el.innerHTML='<div style="max-width:900px">'+
-  '<div class="de-tabs">'+
-    '<div class="de-tab active" onclick="swDE('info',this)">📋 Поступление</div>'+
-    '<div class="de-tab" onclick="swDE('cities',this)">🏙️ Города</div>'+
-    '<div class="de-tab" onclick="swDE('stip',this)">💰 Стипендии</div>'+
-    '<div class="de-tab" onclick="swDE('after',this)">✈️ После зачисления</div>'+
-  '</div>'+
-  '<div id="des-info" class="de-section active">'+
-    '<div class="de-grid">'+
-      '<div class="de-card"><div class="de-label" style="color:#5bb3d0">📋 Основные документы</div>'+
-        '<div class="de-item">Аттестат + нотариальный перевод</div>'+
-        '<div class="de-item">Транскрипт оценок</div>'+
-        '<div class="de-item">Загранпаспорт (копия)</div>'+
-        '<div class="de-item">CV / Резюме</div>'+
-        '<div class="de-item">Мотивационное письмо</div>'+
-        '<div class="de-item">1–2 рекомендации (магистр)</div>'+
-        '<div class="de-item">Языковой сертификат</div>'+
-        '<div class="de-item">Фото 3×4</div>'+
-      '</div>'+
-      '<div class="de-card"><div class="de-label" style="color:#5bb3d0">🗣️ Языковые сертификаты</div>'+
-        '<div style="font-size:11px;font-weight:600;color:#e8e6de;margin:0 0 6px">Немецкий:</div>'+
-        '<div class="de-item">TestDaF: минимум 4×4 (C1)</div>'+
-        '<div class="de-item">DSH-2 / DSH-3 (медицина C2)</div>'+
-        '<div class="de-item">Goethe C1/C2</div>'+
-        '<div style="font-size:11px;font-weight:600;color:#e8e6de;margin:8px 0 6px">Английский:</div>'+
-        '<div class="de-item">IELTS 6.0–7.0+ (зависит от вуза)</div>'+
-        '<div class="de-item">TOEFL iBT 80–100+</div>'+
-        '<div class="de-item">GMAT 650+ (бизнес-программы)</div>'+
-      '</div>'+
-    '</div>'+
-    '<div class="de-grid">'+
-      '<div class="de-card"><div class="de-label" style="color:#c8960a">📅 Дедлайны</div>'+
-        '<div style="font-size:11px;font-weight:600;color:#e8e6de;margin-bottom:6px">Зимний семестр (WS):</div>'+
-        '<div class="de-item">Большинство вузов: 15 июля</div>'+
-        '<div class="de-item">TUM / RWTH порталы: 31 мая</div>'+
-        '<div class="de-item">Медицина (Hochschulstart): 15 июля</div>'+
-        '<div class="de-item">ML Тюбинген IMPRS: 1 апреля!</div>'+
-        '<div class="de-item">WHU Koblenz: 1 апреля</div>'+
-        '<div style="font-size:11px;font-weight:600;color:#e8e6de;margin:8px 0 6px">Летний семестр (SS):</div>'+
-        '<div class="de-item">Большинство вузов: 15 января</div>'+
-        '<div style="font-size:11px;color:#666;margin-top:8px">⚠ uni-assist: подавай за 6–8 нед.</div>'+
-      '</div>'+
-      '<div class="de-card"><div class="de-label" style="color:#4a9a5a">🌐 Платформы подачи</div>'+
-        '<div class="de-item"><span style="color:#e8e6de;font-weight:500">uni-assist.de</span> — большинство вузов</div>'+
-        '<div class="de-item"><span style="color:#e8e6de;font-weight:500">hochschulstart.de</span> — медицина, фармация</div>'+
-        '<div class="de-item"><span style="color:#e8e6de;font-weight:500">TUMonline</span> — только TU München</div>'+
-        '<div class="de-item"><span style="color:#e8e6de;font-weight:500">RWTH Portal</span> — только RWTH Aachen</div>'+
-        '<div class="de-item"><span style="color:#e8e6de;font-weight:500">daad.de</span> — стипендии DAAD</div>'+
-        '<div class="de-item"><span style="color:#e8e6de;font-weight:500">anabin.kmk.org</span> — признание дипломов</div>'+
-      '</div>'+
-    '</div>'+
-    '<div class="de-card"><div class="de-label" style="color:#c84a4a">⚠️ Особые случаи</div>'+
-      '<div class="de-grid" style="margin:0">'+
-        '<div>'+
-          '<div class="de-item"><span style="color:#e8e6de">Медицина:</span> NC от 1.0, TMS-тест, C2 немецкий — подача через Hochschulstart</div>'+
-          '<div class="de-item"><span style="color:#e8e6de">Архитектура/Дизайн:</span> Портфолио 15–20 работ + творческий вступительный экзамен</div>'+
-          '<div class="de-item"><span style="color:#e8e6de">Психология:</span> NC от 1.0–1.5, тест на пригодность во многих вузах</div>'+
-        '</div>'+
-        '<div>'+
-          '<div class="de-item"><span style="color:#e8e6de">TUM:</span> Собственный портал TUMonline, дедлайн WS — 31 мая</div>'+
-          '<div class="de-item"><span style="color:#e8e6de">RWTH:</span> Собственный RWTH Portal</div>'+
-          '<div class="de-item"><span style="color:#e8e6de">IMPRS (ML):</span> Дедлайн 1 апреля, стипендия автоматом</div>'+
-          '<div class="de-item"><span style="color:#e8e6de">WHU:</span> Платный частный вуз, нужен GMAT 650+</div>'+
-        '</div>'+
-      '</div>'+
-    '</div>'+
-  '</div>'+
-  '<div id="des-cities" class="de-section">'+
-    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px">'+cityRows+'</div>'+
-  '</div>'+
-  '<div id="des-stip" class="de-section">'+
-    '<div class="de-grid-3">'+
-      '<div class="de-stip-card"><div class="de-stip-name">DAAD</div><div class="de-stip-desc">Главная стипендия Германии для иностранцев. Покрывает проживание, страховку, учёбу. daad.de</div></div>'+
-      '<div class="de-stip-card"><div class="de-stip-name">Deutschlandstipendium</div><div class="de-stip-desc">300€/мес от вуза + компании. Подаётся через свой университет после зачисления.</div></div>'+
-      '<div class="de-stip-card"><div class="de-stip-name">IMPRS-IS (Тюбинген)</div><div class="de-stip-desc">Полная стипендия для ML/AI. Совместно с Max-Planck. Дедлайн 1 апреля.</div></div>'+
-      '<div class="de-stip-card"><div class="de-stip-name">Friedrich Ebert Stiftung</div><div class="de-stip-desc">Стипендия социал-демократического фонда. ~850€/мес + льготы.</div></div>'+
-      '<div class="de-stip-card"><div class="de-stip-name">Konrad Adenauer Stiftung</div><div class="de-stip-desc">Стипендия ХДС-фонда. ~850€/мес. Для активных студентов.</div></div>'+
-      '<div class="de-stip-card"><div class="de-stip-name">Heinrich Böll Stiftung</div><div class="de-stip-desc">Экология и права человека. ~850€/мес. Идеально для экологических направлений.</div></div>'+
-      '<div class="de-stip-card"><div class="de-stip-name">Erasmus+</div><div class="de-stip-desc">Для обменных семестров. Около 500–800€/мес в зависимости от страны.</div></div>'+
-      '<div class="de-stip-card"><div class="de-stip-name">Hanns Seidel Stiftung</div><div class="de-stip-desc">Баварский фонд. ~850€/мес. Предпочтительно для студентов в Баварии.</div></div>'+
-      '<div class="de-stip-card"><div class="de-stip-name">Rosa Luxemburg Stiftung</div><div class="de-stip-desc">Левый политический фонд. ~850€/мес. Активизм и социальные науки.</div></div>'+
-    '</div>'+
-  '</div>'+
-  '<div id="des-after" class="de-section">'+
-    '<div class="de-grid">'+
-      '<div class="de-card"><div class="de-label" style="color:#5bb3d0">✈️ Студенческая виза</div>'+
-        '<div class="de-item">Тип: §16b AufenthG (студенческая)</div>'+
-        '<div class="de-item">Блокировочный счёт: <span style="color:#c8960a">~11 208 €/год</span> (934€/мес)</div>'+
-        '<div class="de-item">Подаётся в посольстве Германии</div>'+
-        '<div class="de-item">Срок рассмотрения: 4–8 недель</div>'+
-        '<div class="de-item">После получения — открыть счёт в немецком банке</div>'+
-      '</div>'+
-      '<div class="de-card"><div class="de-label" style="color:#4a9a5a">🏠 Первые шаги в Германии</div>'+
-        '<div class="de-item">Anmeldung (прописка) — в течение 2 недель</div>'+
-        '<div class="de-item">Медстраховка: TK / AOK / Barmer (~120€/мес)</div>'+
-        '<div class="de-item">Семестровый взнос: 200–400€ (зависит от вуза)</div>'+
-        '<div class="de-item">ISIC — студенческая карта со скидками</div>'+
-        '<div class="de-item">Semesterticket — безлимитный транспорт</div>'+
-        '<div class="de-item">Studentenwerk — студенческое общежитие</div>'+
-      '</div>'+
-    '</div>'+
-    '<div class="de-card"><div class="de-label" style="color:#c8960a">💳 Финансы студента</div>'+
-      '<div class="de-grid" style="margin:0">'+
-        '<div>'+
-          '<div style="font-size:11px;font-weight:600;color:#e8e6de;margin-bottom:8px">Обязательные расходы/мес:</div>'+
-          '<div class="de-item">Аренда: 400–800€ (зависит от города)</div>'+
-          '<div class="de-item">Еда: 200–300€</div>'+
-          '<div class="de-item">Транспорт: 0–50€ (Semesterticket)</div>'+
-          '<div class="de-item">Медстраховка: ~120€</div>'+
-        '</div>'+
-        '<div>'+
-          '<div style="font-size:11px;font-weight:600;color:#e8e6de;margin-bottom:8px">Подработка:</div>'+
-          '<div class="de-item">Разрешено до 120 дней/год</div>'+
-          '<div class="de-item">Студенческий ассистент (HiWi): 12–15€/час</div>'+
-          '<div class="de-item">Минимальная зарплата: 12.41€/час</div>'+
-          '<div class="de-item">BAföG для граждан ЕС</div>'+
-        '</div>'+
-      '</div>'+
-    '</div>'+
-  '</div>'+
-  '</div>';
-}
+function swV(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});document.getElementById('v'+n).classList.add('active');}
 function setL(lang,el){G.lang=lang;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.remove('active');});el.classList.add('active');document.getElementById('hint').textContent=G.ai?AHINTS[lang]:HINTS[lang];var q=document.getElementById('q').value;if(q.trim()&&!G.ai)doSearch();}
 function onIn(v){if(G.ai){clearTimeout(G.timer);return;}clearTimeout(G.timer);G.timer=setTimeout(function(){doSearch();},300);}
 function togAI(){G.ai=!G.ai;var btn=document.getElementById('aibtn'),sb=document.getElementById('sbtn'),h=document.getElementById('hint'),bar=document.getElementById('aibar'),inp=document.getElementById('q');if(G.ai){btn.classList.add('active');btn.textContent='✦ AI';sb.classList.add('visible');h.textContent=AHINTS[G.lang];h.className='hint ai-mode';inp.placeholder='Опишите клиента...';inp.focus();}else{btn.classList.remove('active');btn.textContent='✦ AI';sb.classList.remove('visible');h.textContent=HINTS[G.lang];h.className='hint';bar.style.display='none';inp.placeholder='Поиск... (медицина, 800 евро, хорошие шансы)';var q=inp.value;if(q.trim())doSearch();else rebuild(null,null);}}
@@ -672,35 +460,6 @@ document.getElementById('adminLoginBtn').addEventListener('click',function(){var
 document.getElementById('addUniBtn').addEventListener('click',addUni);
 document.getElementById('refreshBtn').addEventListener('click',function(){loadData();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')openAdmin(false);});
-
-var CURRENT_TYPE = 'all';
-function swType(t, el) {
-  CURRENT_TYPE = t;
-  document.querySelectorAll('.type-btn').forEach(function(b){ b.classList.remove('active'); });
-  el.classList.add('active');
-  doSearch();
-}
-
-function applyTypeFilter(e) {
-  if (CURRENT_TYPE === 'all') return true;
-  return (e.utype || 'uni') === CURRENT_TYPE;
-}
-
-function swCountry(code, el) {
-  if(el.classList.contains('soon')) return;
-  document.querySelectorAll('.country-btn').forEach(function(b){ b.classList.remove('active'); });
-  el.classList.add('active');
-  // hide all placeholders and main content
-  document.querySelectorAll('.country-ph').forEach(function(p){ p.style.display='none'; });
-  var main = document.getElementById('main-content');
-  var ph = document.getElementById('country-'+code+'-placeholder');
-  if(ph) {
-    main.style.display='none';
-    ph.style.display='block';
-  } else {
-    if(main) main.style.display='';
-  }
-}
 
 loadData();
 rebuild(null,null);
