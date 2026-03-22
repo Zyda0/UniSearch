@@ -1,45 +1,36 @@
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-export default async function handler(request) {
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json',
-  };
-
-  if (request.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: corsHeaders });
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
   }
 
-  if (request.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: corsHeaders,
-    });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: 'GEMINI_API_KEY не настроен в переменных окружения Vercel' });
   }
 
   let body = {};
   try {
-    body = await request.json();
+    body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
-      status: 400,
-      headers: corsHeaders,
-    });
+    return res.status(400).json({ error: 'Неверный JSON в теле запроса' });
   }
 
   const { system = '', userMessage = '' } = body;
-  const apiKey = process.env.GEMINI_API_KEY;
 
-  if (!apiKey) {
-    return new Response(JSON.stringify({ error: 'API key not configured' }), {
-      status: 500,
-      headers: corsHeaders,
-    });
+  if (!userMessage.trim()) {
+    return res.status(400).json({ error: 'userMessage не может быть пустым' });
   }
 
   try {
-    const response = await fetch(
+    const geminiResp = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
@@ -48,52 +39,50 @@ export default async function handler(request) {
           contents: [
             {
               role: 'user',
-              parts: [{ text: `${system}\n\n${userMessage}` }],
-            },
+              parts: [{ text: system + '\n\nЗапрос клиента: ' + userMessage }]
+            }
           ],
           generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 1500,
-          },
-        }),
+            temperature: 0.2,
+            maxOutputTokens: 2000
+          }
+        })
       }
     );
 
-    const data = await response.json().catch(() => null);
+    const geminiData = await geminiResp.json().catch(() => null);
 
-    if (!response.ok) {
-      return new Response(
-        JSON.stringify({ error: data?.error?.message || 'Gemini error' }),
-        { status: response.status, headers: corsHeaders }
-      );
+    if (!geminiResp.ok) {
+      const msg = geminiData?.error?.message || ('Gemini вернул статус ' + geminiResp.status);
+      return res.status(geminiResp.status).json({ error: msg });
     }
 
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const stripped = String(rawText).replace(/```json|```/gi, '').trim();
+    const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-    const first = stripped.indexOf('{');
-    const last = stripped.lastIndexOf('}');
+    const first = rawText.indexOf('{');
+    const last  = rawText.lastIndexOf('}');
+
     if (first === -1 || last === -1 || last <= first) {
-      return new Response(
-        JSON.stringify({
-          error: 'Gemini returned non-JSON response',
-          raw: rawText.slice(0, 500),
-        }),
-        { status: 500, headers: corsHeaders }
-      );
+      return res.status(500).json({
+        error: 'Gemini вернул ответ без JSON',
+        raw: rawText.slice(0, 300)
+      });
     }
 
-    const jsonText = stripped.slice(first, last + 1);
-    JSON.parse(jsonText);
+    const jsonText = rawText.slice(first, last + 1);
 
-    return new Response(JSON.stringify({ text: jsonText }), {
-      status: 200,
-      headers: corsHeaders,
-    });
-  } catch (error) {
-    return new Response(
-      JSON.stringify({ error: error?.message || 'Server error' }),
-      { status: 500, headers: corsHeaders }
-    );
+    try {
+      JSON.parse(jsonText);
+    } catch {
+      return res.status(500).json({
+        error: 'Gemini вернул невалидный JSON',
+        raw: jsonText.slice(0, 300)
+      });
+    }
+
+    return res.status(200).json({ text: jsonText });
+
+  } catch (err) {
+    return res.status(500).json({ error: err.message || 'Внутренняя ошибка сервера' });
   }
 }
