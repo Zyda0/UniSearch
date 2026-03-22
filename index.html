@@ -2,230 +2,191 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Куратор — Университеты Германии</title>
+<title>UniSearch</title>
+
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e8e6de; font-size: 13px; padding: 1rem; }
-.toolbar { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
-.tab-group { display: flex; border: 0.5px solid #2a2a28; border-radius: 8px; overflow: hidden; }
-.tab { padding: 6px 12px; font-size: 12px; font-weight: 500; color: #888780; background: #1a1a18; cursor: pointer; border-right: 0.5px solid #2a2a28; white-space: nowrap; }
-.tab:last-child { border-right: none; }
-.tab.active { background: #222220; color: #e8e6de; }
-.search-wrap { display: flex; flex: 1; min-width: 200px; border: 0.5px solid #2a2a28; border-radius: 8px; overflow: hidden; background: #1a1a18; }
-.search-wrap input { flex: 1; padding: 6px 10px; font-size: 12px; border: none; background: transparent; color: #e8e6de; outline: none; min-width: 0; }
-.search-wrap input::placeholder { color: #555; }
-.ai-btn { padding: 5px 11px; font-size: 11px; font-weight: 500; color: #888; background: transparent; border: none; border-left: 0.5px solid #2a2a28; cursor: pointer; white-space: nowrap; transition: background .15s; }
-.ai-btn:hover { background: #222; }
-.ai-btn.active { background: #0c2a3a; color: #5bb3d0; }
-.send-btn { padding: 5px 10px; font-size: 13px; color: #888; background: transparent; border: none; border-left: 0.5px solid #2a2a28; cursor: pointer; display: none; align-items: center; }
-.send-btn:hover { background: #222; color: #e8e6de; }
-.send-btn.visible { display: flex; }
-.lang-group { display: flex; border: 0.5px solid #2a2a28; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
-.lang-btn { padding: 5px 9px; font-size: 12px; color: #888; background: #1a1a18; cursor: pointer; border-right: 0.5px solid #2a2a28; }
-.lang-btn:last-child { border-right: none; }
-.lang-btn.active { background: #222; color: #e8e6de; }
-.hint { font-size: 11px; color: #555; padding: 0 0 10px; }
-.hint.ai-mode { color: #5bb3d0; }
-.filter-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
-.ftag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 11px; background: #0c2a3a; color: #5bb3d0; border: 0.5px solid #1a4a5a; }
-.ftag-x { cursor: pointer; font-size: 13px; opacity: .7; }
-.ftag-x:hover { opacity: 1; }
-.ai-bar { padding: 9px 14px; background: #0c2a3a; border: 0.5px solid #1a4a5a; border-radius: 8px; margin-bottom: 10px; font-size: 12px; color: #5bb3d0; line-height: 1.6; display: none; }
-.view { display: none; }
-.view.active { display: block; }
-.sh { padding: 7px 12px; background: #1a1a18; border: 0.5px solid #2a2a28; border-radius: 8px; margin-bottom: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; user-select: none; }
-.sh:hover { background: #1e1e1c; }
-.st { font-size: 13px; font-weight: 500; color: #e8e6de; flex: 1; }
-.sm { font-size: 11px; color: #555; }
-.chev { font-size: 9px; color: #555; transition: transform .2s; }
-.chev.open { transform: rotate(180deg); }
-.sb { display: none; margin-bottom: 10px; }
-.sb.open { display: block; }
-.card { border: 0.5px solid #2a2a28; border-radius: 8px; margin-bottom: 6px; overflow: hidden; }
-.card.a1 { border-color: #1a5a2a; }
-.card.a2 { border-color: #5a4a10; }
-.card.ano { opacity: .4; }
-.ag { padding: 6px 12px; background: #0a2a15; font-size: 11px; color: #4a9a5a; border-bottom: 0.5px solid #1a4a2a; line-height: 1.5; }
-.aw { padding: 6px 12px; background: #2a1f05; font-size: 11px; color: #c8960a; border-top: 0.5px solid #4a3a10; line-height: 1.5; }
-.an { padding: 5px 12px 7px 36px; font-size: 11px; color: #c84a4a; }
-.ch { display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer; background: #1a1a18; user-select: none; }
-.ch:hover { background: #1e1e1c; }
-.cr { font-size: 10px; color: #555; min-width: 14px; font-weight: 500; }
-.ci { flex: 1; min-width: 0; }
-.cn { font-size: 12px; font-weight: 500; color: #e8e6de; }
-.cs { font-size: 11px; color: #888; margin-top: 1px; }
-.bgs { display: flex; gap: 4px; flex-wrap: wrap; flex-shrink: 0; }
-.bdg { display: inline-block; padding: 1px 6px; border-radius: 20px; font-size: 10px; font-weight: 500; white-space: nowrap; }
-.be { background: #0c2a3a; color: #5bb3d0; }
-.bt { background: #2a1f05; color: #c8960a; }
-.bs { background: #0a2a15; color: #4a9a5a; }
-.bhi { background: #2a0a0a; color: #c84a4a; }
-.bmd { background: #2a1f05; color: #c8960a; }
-.blo { background: #0a2a15; color: #4a9a5a; }
-.cb { display: none; padding: 10px 12px; border-top: 0.5px solid #2a2a28; background: #161614; grid-template-columns: 1fr 1fr; gap: 10px; }
-.cb.open { display: grid; }
-.cl { font-size: 10px; font-weight: 500; color: #555; text-transform: uppercase; letter-spacing: .05em; margin: 8px 0 4px; }
-.cl:first-child { margin-top: 0; }
-.row { display: flex; gap: 5px; font-size: 11px; color: #888; line-height: 1.6; }
-.row::before { content: "—"; color: #444; flex-shrink: 0; }
-.pill { display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; border-radius: 20px; font-size: 10px; background: #222; color: #888; border: 0.5px solid #333; }
-.dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-.empty { font-size: 12px; color: #555; padding: 24px; text-align: center; }
-.dots { display: inline-flex; gap: 3px; vertical-align: middle; }
-.dots span { width: 4px; height: 4px; border-radius: 50%; background: currentColor; animation: dp 1.2s infinite; }
-.dots span:nth-child(2) { animation-delay: .2s; }
-.dots span:nth-child(3) { animation-delay: .4s; }
-@keyframes dp { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
+body {
+  background: #0f0f0f;
+  color: #eee;
+  font-family: Arial;
+  padding: 20px;
+}
+
+h2 {
+  border-bottom: 1px solid #333;
+  padding: 10px;
+}
+
+.card {
+  border: 1px solid #333;
+  padding: 15px;
+  margin: 10px 0;
+  background: #111;
+}
+
+/* админ кнопка */
+#adminBtn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #111;
+  border: 1px solid #444;
+  color: white;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+}
+
+/* админ панель */
+#adminPanel {
+  display: none;
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background: #111;
+  border: 1px solid #444;
+  padding: 20px;
+}
 </style>
+
 </head>
 <body>
 
-<div class="toolbar">
-  <div class="tab-group">
-    <div class="tab active" onclick="swV('dir',this)">По направлениям</div>
-    <div class="tab" onclick="swV('city',this)">По городам</div>
-    <div class="tab" onclick="swV('uni',this)">По вузам</div>
-  </div>
-  <div class="search-wrap">
-    <input id="q" placeholder="Поиск... (медицина, 800 евро, хорошие шансы)" oninput="onIn(this.value)">
-    <button class="ai-btn" id="aibtn" onclick="togAI()">✦ AI</button>
-    <button class="send-btn" id="sbtn" onclick="sendAI()">↵</button>
-  </div>
-  <div class="lang-group">
-    <div class="lang-btn active" onclick="setL('ruku',this)">🇷🇺🇺🇦</div>
-    <div class="lang-btn" onclick="setL('deen',this)">🇩🇪🇬🇧</div>
+<h1>UniSearch</h1>
+
+<div id="app"></div>
+
+<!-- ⚙️ кнопка -->
+<button id="adminBtn">⚙️</button>
+
+<!-- админ панель -->
+<div id="adminPanel">
+  <input id="adminPass" placeholder="Password"><br><br>
+  <button onclick="checkAdmin()">Login</button>
+
+  <div id="adminContent" style="display:none;">
+    <hr>
+    <input id="uni" placeholder="Название"><br><br>
+    <input id="city" placeholder="Город"><br><br>
+    <input id="direction" placeholder="Направление"><br><br>
+
+    <button onclick="addUni()">Добавить</button>
   </div>
 </div>
-<div class="filter-tags" id="ftags"></div>
-<div class="hint" id="hint">Пример: медицина 800 евро, хорошие шансы + Берлин</div>
-<div class="ai-bar" id="aibar"></div>
-<div id="vdir" class="view active"></div>
-<div id="vcity" class="view"></div>
-<div id="vuni" class="view"></div>
 
 <script>
-var G = { lang:'ruku', ai:false, timer:null };
-var HINTS = { ruku:'Пример: медицина 800 евро, хорошие шансы + Берлин', deen:'Beispiel: Medizin 800 Euro, gute Chancen, Berlin' };
-var AHINTS = { ruku:'✦ AI включён — опишите клиента и нажмите ↵', deen:'✦ AI on — describe client and press ↵' };
-var CCOST = { munich:1400,berlin:1200,heidelberg:950,bonn:900,tuebingen:750,dresden:750,karlsruhe:900,aachen:850,hamburg:1200,cologne:950,frankfurt:1300,freiburg:900 };
-var CITIES = {
-  munich:{n:'Мюнхен',l:'Bayern',c:'high',cl:'€€€'},berlin:{n:'Берлин',l:'Berlin',c:'high',cl:'€€€'},
-  heidelberg:{n:'Гейдельберг',l:'Baden-Württemberg',c:'mid',cl:'€€'},bonn:{n:'Бонн',l:'NRW',c:'mid',cl:'€€'},
-  tuebingen:{n:'Тюбинген',l:'Baden-Württemberg',c:'low',cl:'€'},dresden:{n:'Дрезден',l:'Sachsen',c:'low',cl:'€'},
-  karlsruhe:{n:'Карлсруэ',l:'Baden-Württemberg',c:'mid',cl:'€€'},aachen:{n:'Аахен',l:'NRW',c:'mid',cl:'€€'},
-  hamburg:{n:'Гамбург',l:'Hamburg',c:'high',cl:'€€€'},cologne:{n:'Кёльн',l:'NRW',c:'mid',cl:'€€'},
-  frankfurt:{n:'Франкфурт',l:'Hessen',c:'high',cl:'€€€'},freiburg:{n:'Фрайбург',l:'Baden-Württemberg',c:'mid',cl:'€€'}
-};
-var CC={high:'#c84a4a',mid:'#c8960a',low:'#4a9a5a'};
-var SL={e:'Элитный',t:'Технический',s:'Сильный'};
-var SC={e:'be',t:'bt',s:'bs'};
-var CHL={low:'Шансы: низкие',mid:'Шансы: средние',hi:'Шансы: высокие'};
-var CHC={low:'bhi',mid:'bmd',hi:'blo'};
-var SV={e:0,t:1,s:2};
-var CORD=['munich','berlin','heidelberg','bonn','tuebingen','karlsruhe','dresden','aachen','hamburg','cologne','frankfurt','freiburg'];
 
-var DATA=[
-  {dir:'Computer Science / AI',entries:[
-    {rank:1,uni:'TU München',city:'munich',st:'e',eng:true,ch:'low',sub:'Technische Universität München',dl:'WS: 31 мая / SS: нет',docs:['Диплом CS/математика (180 ECTS)','CV, мотивационное письмо','2 рекомендации'],lr:['IELTS 6.5+ / TOEFL 88+'],notes:['Портал TUMonline (не uni-assist)','Вступительный тест по алгоритмам','Партнёрство с Google, Microsoft'],ms:['Data Engineering','Robotics','Informatics'],pros:['Топ-3 CS в Европе','Много стажировок'],cons:['Очень высокий конкурс','Дорогой город'],tags:['cs','ai','munich','elite','chanceslow','english']},
-    {rank:2,uni:'KIT',city:'karlsruhe',st:'e',eng:true,ch:'mid',sub:'Karlsruher Institut für Technologie',dl:'WS: 15 июля / SS: 15 января',docs:['Диплом CS или математика','CV, мотивационное письмо','2 рекомендации'],lr:['IELTS 6.5+ / TOEFL 90+','TestDaF 4×4'],notes:['Подача через uni-assist','Вступительный тест возможен'],ms:['Data Science','Informatik','Robotics'],pros:['Топ-5 CS Германии','Ниже конкурс чем TUM'],cons:['Небольшой город'],tags:['cs','ai','karlsruhe','elite','chancesmid','english']},
-    {rank:3,uni:'RWTH Aachen',city:'aachen',st:'t',eng:true,ch:'mid',sub:'Rheinisch-Westfälische TH',dl:'WS: 15 июля / SS: 15 января',docs:['Диплом CS или математика','CV, мотивационное письмо','Рекомендации'],lr:['IELTS 6.5+ / TOEFL 90+','DSH-2 (нем.)'],notes:['Портал RWTH (не uni-assist)','Онлайн-тест для ряда программ'],ms:['Software Engineering','Data Science'],pros:['Крупнейший технический вуз','Сильная индустрия'],cons:['Высокий конкурс'],tags:['cs','aachen','technical','chancesmid','english']},
-    {rank:4,uni:'TU Berlin',city:'berlin',st:'t',eng:true,ch:'mid',sub:'Technische Universität Berlin',dl:'WS: 15 июля / SS: 15 января',docs:['Диплом CS или математика','CV, мотивационное письмо'],lr:['IELTS 6.0+ / TOEFL 80+','DSH-2 (нем.)'],notes:['uni-assist','Стартап-экосистема Берлина'],ms:['Computer Science','Distributed Systems'],pros:['Берлин — стартап-хаб','Умеренный конкурс'],cons:['Ниже рейтинг чем TUM/KIT'],tags:['cs','berlin','technical','chancesmid','english']}
-  ]},
-  {dir:'Machine Learning / AI (специализация)',entries:[
-    {rank:1,uni:'Universität Tübingen',city:'tuebingen',st:'e',eng:true,ch:'low',sub:'Eberhard Karls · IMPRS-IS',dl:'WS: 1 апреля (ранний!)',docs:['Диплом CS/математика/статистика','CV, мотивационное письмо','2 рекомендации','Research statement'],lr:['IELTS 6.5+ / TOEFL 95+'],notes:['IMPRS-IS совместно с Max-Planck','Полностью на английском','Ранний дедлайн — 1 апреля'],ms:['Machine Learning','Data Science','Cognitive Science'],pros:['Топ-1 ML в Германии','Стипендии IMPRS'],cons:['Маленький город','Ранний дедлайн'],tags:['ai','ml','tuebingen','elite','chanceslow','english','scholarship']},
-    {rank:2,uni:'LMU München',city:'munich',st:'e',eng:true,ch:'low',sub:'Ludwig-Maximilians-Universität',dl:'WS: 15 июня',docs:['Диплом CS/математика','CV, мотивационное письмо','2 рекомендации'],lr:['IELTS 6.5+ / TOEFL 90+'],notes:['Совместная программа с TUM','uni-assist','Партнёрство с Max-Planck'],ms:['Data Science','Statistics','AI'],pros:['Сильная исследовательская база','Мюнхен'],cons:['Очень высокий конкурс','Дорогой город'],tags:['ai','ml','munich','elite','chanceslow','english']}
-  ]},
-  {dir:'Медицина',entries:[
-    {rank:1,uni:'LMU München',city:'munich',st:'e',eng:false,ch:'low',sub:'Ludwig-Maximilians-Universität',dl:'Hochschulstart: 15 июля',docs:['NC от 1.0','TMS-тест (обязательно)','Медицинский/волонтёрский опыт'],lr:['Немецкий C2: TestDaF 5×5 или DSH-3'],notes:['Подача через Hochschulstart','Длительность 6 лет'],ms:['Хирургия','Неврология','Онкология'],pros:['Лучшая медшкола Германии','Клиника мирового уровня'],cons:['NC жесточайший — 1.0','Только немецкий'],tags:['medicine','munich','elite','chanceslow']},
-    {rank:2,uni:'Universität Heidelberg',city:'heidelberg',st:'e',eng:false,ch:'low',sub:'Ruprecht-Karls · осн. 1386',dl:'Hochschulstart: 15 июля',docs:['NC от 1.0','TMS-тест обязателен','Волонтёрский опыт в медицине'],lr:['Немецкий C2: DSH-3 или TestDaF 5×5'],notes:['Подача через Hochschulstart','Связь с DKFZ (онкология)'],ms:['Молекулярная медицина','Онкология'],pros:['Топ-2 медицина','DKFZ рядом'],cons:['Очень высокий NC','Маленький город'],tags:['medicine','heidelberg','elite','chanceslow']},
-    {rank:3,uni:'Universität Tübingen',city:'tuebingen',st:'e',eng:false,ch:'low',sub:'Eberhard Karls',dl:'Hochschulstart: 15 июля',docs:['NC от 1.0–1.2','TMS-тест','Медицинский опыт'],lr:['Немецкий C2: TestDaF 5×5'],notes:['Подача через Hochschulstart'],ms:['Нейромедицина','Биомедицина'],pros:['Топ медицина','Дешёвый город'],cons:['NC очень высокий'],tags:['medicine','tuebingen','elite','chanceslow']},
-    {rank:4,uni:'Universität zu Köln',city:'cologne',st:'s',eng:false,ch:'low',sub:'UzK',dl:'Hochschulstart: 15 июля',docs:['NC от 1.0–1.3','TMS-тест','Медицинский опыт'],lr:['Немецкий C2: DSH-3'],notes:['Подача через Hochschulstart'],ms:['Хирургия','Терапия'],pros:['Крупная клиника','Кёльн — большой город'],cons:['NC высокий'],tags:['medicine','cologne','strong','chanceslow']}
-  ]},
-  {dir:'Машиностроение / Инженерия',entries:[
-    {rank:1,uni:'RWTH Aachen',city:'aachen',st:'t',eng:true,ch:'mid',sub:'Крупнейший технический вуз Германии',dl:'WS: 15 июля',docs:['Диплом по инженерии (180 ECTS)','CV, мотивационное письмо','2 рекомендации'],lr:['IELTS 6.5+ / TOEFL 90+','DSH-2 (нем.)'],notes:['Портал RWTH','Партнёрство BMW, Ford, Thyssen'],ms:['Mechanical Engineering','Automotive Engineering'],pros:['Лучшее машиностроение Германии','Сильная индустрия'],cons:['Высокий конкурс','Небольшой город'],tags:['mechanical','engineering','aachen','technical','chancesmid','english']},
-    {rank:2,uni:'TU München',city:'munich',st:'e',eng:true,ch:'mid',sub:'Technische Universität München',dl:'WS: 31 мая',docs:['Диплом по инженерии','CV, мотивационное письмо'],lr:['IELTS 6.5+','TestDaF 4×4'],notes:['TUMonline','Партнёрство BMW, Siemens, Airbus'],ms:['Mechanical Engineering','Aerospace'],pros:['Партнёры мирового уровня','Топ рейтинг'],cons:['Дорогой город','Высокий конкурс'],tags:['mechanical','engineering','munich','elite','chancesmid','english']},
-    {rank:3,uni:'TU Dresden',city:'dresden',st:'e',eng:true,ch:'hi',sub:'Technische Universität Dresden',dl:'WS: 15 июля',docs:['Диплом по инженерии','CV, мотивационное письмо'],lr:['TestDaF 4×4 / DSH-2','IELTS 6.0+'],notes:['uni-assist','Fraunhofer партнёрство'],ms:['Maschinenbau','Biomedizinische Technik'],pros:['Ниже конкурс','Низкая стоимость жизни'],cons:['Менее известен за рубежом'],tags:['mechanical','engineering','dresden','elite','chanceshi']}
-  ]},
-  {dir:'Физика / Математика',entries:[
-    {rank:1,uni:'Universität Bonn',city:'bonn',st:'e',eng:true,ch:'mid',sub:'Hausdorff Center for Mathematics',dl:'WS: 15 июля',docs:['Сильный диплом по математике','CV, мотивационное письмо','2 рекомендации'],lr:['IELTS 6.5+','TestDaF 4×4'],notes:['Hausdorff Center — мировой уровень','uni-assist'],ms:['Mathematics','Mathematical Physics'],pros:['Лучшая математика Германии','Умеренная стоимость жизни'],cons:['Небольшой город'],tags:['mathematics','physics','bonn','elite','chancesmid','english']},
-    {rank:2,uni:'LMU München',city:'munich',st:'e',eng:true,ch:'mid',sub:'Ludwig-Maximilians-Universität',dl:'WS: 15 июля',docs:['Диплом по физике/математике','CV, мотивационное письмо'],lr:['IELTS 6.5+','TestDaF 4×4'],notes:['29 нобелевских лауреатов','Партнёрство с Max-Planck'],ms:['Physics','Mathematics','Astrophysics'],pros:['Исследовательская база','Мюнхен'],cons:['Дорогой город'],tags:['physics','mathematics','munich','elite','chancesmid','english']}
-  ]},
-  {dir:'Право',entries:[
-    {rank:1,uni:'LMU München',city:'munich',st:'e',eng:false,ch:'mid',sub:'Ludwig-Maximilians-Universität',dl:'WS: 15 июля',docs:['Аттестат с высоким баллом','Мотивационное письмо'],lr:['Немецкий C1/C2: TestDaF 4×4 / DSH-2'],notes:['NC ~ 1.5','Только на немецком','uni-assist'],ms:['Deutsches Recht','European Law','IP Law'],pros:['Топ-1 право Германии','Мюнхен — юридический центр'],cons:['Только немецкий','Высокий NC'],tags:['law','munich','elite','chancesmid']},
-    {rank:2,uni:'Universität Hamburg',city:'hamburg',st:'s',eng:false,ch:'hi',sub:'UHH',dl:'WS: 15 июля',docs:['Аттестат','Мотивационное письмо'],lr:['Немецкий C1: TestDaF 4×4'],notes:['NC ~2.0','uni-assist','Морское право — лучшее'],ms:['Deutsches Recht','Internationales Recht'],pros:['Ниже конкурс','Морское право — лучшее'],cons:['Дорогой город'],tags:['law','hamburg','strong','chanceshi']}
-  ]},
-  {dir:'Финансы / Экономика',entries:[
-    {rank:1,uni:'Goethe-Universität Frankfurt',city:'frankfurt',st:'s',eng:true,ch:'mid',sub:'Finance — рядом ЕЦБ и Deutsche Bank',dl:'WS: 15 июля',docs:['Диплом экономика/математика','CV, мотивационное письмо','2 рекомендации'],lr:['IELTS 6.5+ / TOEFL 90+','DSH-2 (нем.)'],notes:['ЕЦБ, Deutsche Bank, Goldman Sachs рядом','uni-assist'],ms:['Finance','Quantitative Finance'],pros:['Финансовый центр Европы','Лучший для банковской карьеры'],cons:['Дорогой город','Высокий конкурс'],tags:['finance','economics','frankfurt','strong','chancesmid','english']},
-    {rank:2,uni:'Universität zu Köln',city:'cologne',st:'s',eng:true,ch:'hi',sub:'UzK — крупнейший экономический факультет',dl:'WS: 15 июля',docs:['Диплом по экономике','CV, мотивационное письмо'],lr:['IELTS 6.0+','DSH-2 (нем.)'],notes:['uni-assist','~50 000 студентов'],ms:['Business Administration','Economics'],pros:['Ниже конкурс','Крупная бизнес-сеть'],cons:['Менее престижен чем Frankfurt'],tags:['economics','cologne','strong','chanceshi','english']}
-  ]},
-  {dir:'Экология / Биология',entries:[
-    {rank:1,uni:'Albert-Ludwigs-Universität Freiburg',city:'freiburg',st:'s',eng:true,ch:'hi',sub:'Топ экология Германии',dl:'WS: 15 июля',docs:['Диплом по биологии/экологии','CV, мотивационное письмо'],lr:['IELTS 6.0+','TestDaF 4×4'],notes:['Без NC','uni-assist','Граница с Францией и Швейцарией'],ms:['Ecology','Environmental Science','Biology'],pros:['Топ экология','Низкий конкурс','Качество жизни'],cons:['Небольшой город'],tags:['biology','ecology','freiburg','strong','chanceshi','english']},
-    {rank:2,uni:'Universität Heidelberg',city:'heidelberg',st:'e',eng:true,ch:'mid',sub:'DKFZ — онкологический центр',dl:'WS: 15 июля',docs:['Диплом по биологии/химии','CV, мотивационное письмо','2 рекомендации'],lr:['IELTS 6.5+','DSH-2 (нем.)'],notes:['Связь с DKFZ','uni-assist'],ms:['Molecular Biosciences','Biochemistry'],pros:['DKFZ рядом','Элитный статус'],cons:['Дороже Фрайбурга'],tags:['biology','ecology','heidelberg','elite','chancesmid','english']}
-  ]}
-];
+// 🔥 ВСТАВЬ СВОИ ДАННЫЕ
+const SUPABASE_URL = 'https://hbkltwkspfbnjoltfxby.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_LH9wJzvN8Img4roHKalcKQ_CiRxtp3d';
 
-/* ── умный парсер запроса ── */
-function parseQ(q){var lo=q.toLowerCase();var filters=[];var budget=null;var re=/(\d{3,5})\s*(?:евро|euro|eur|€)/gi,m;while((m=re.exec(lo))!==null){var n=parseInt(m[1]);if(n>=300&&n<=5000){budget=n;filters.push({label:'≤'+n+'€/мес',type:'budget',value:n});}}var cm=[{re:/хорош|высок.{0,10}шанс|низк.{0,10}конкурс|good chance|hohe chance|висок.{0,10}шанс/i,val:'hi',label:'Шансы: высокие'},{re:/средн.{0,10}шанс|medium chance/i,val:'mid',label:'Шансы: средние'},{re:/низк.{0,10}шанс|высок.{0,10}конкурс|low chance/i,val:'low',label:'Шансы: низкие'}];for(var i=0;i<cm.length;i++){if(cm[i].re.test(lo)){filters.push({label:cm[i].label,type:'chance',value:cm[i].val});break;}}var dm=[{re:/медицин|medicine|medizin/i,val:'medicine',label:'Медицина'},{re:/computer science|cs\b|информатик|інформатик|informatik/i,val:'cs',label:'CS'},{re:/machine learning|ml\b|нейросет/i,val:'ml',label:'ML'},{re:/\bai\b|искусств.{0,5}интелл/i,val:'ai',label:'AI'},{re:/машиностроен|инженер|maschinenbau|mechanical/i,val:'mechanical',label:'Машиностроение'},{re:/экономик|wirtschaft|economics/i,val:'economics',label:'Экономика'},{re:/финанс|finance/i,val:'finance',label:'Финансы'},{re:/биолог|biology/i,val:'biology',label:'Биология'},{re:/экологи|ecology/i,val:'ecology',label:'Экология'},{re:/право|law\b/i,val:'law',label:'Право'},{re:/физик|physics/i,val:'physics',label:'Физика'},{re:/математик|mathematics/i,val:'mathematics',label:'Математика'}];for(var i=0;i<dm.length;i++){if(dm[i].re.test(lo))filters.push({label:dm[i].label,type:'tag',value:dm[i].val});}var ctm=[{re:/мюнхен|münchen|munich/i,val:'munich',label:'Мюнхен'},{re:/берлин|berlin/i,val:'berlin',label:'Берлин'},{re:/гейдельберг|heidelberg/i,val:'heidelberg',label:'Гейдельберг'},{re:/\bбонн\b|bonn/i,val:'bonn',label:'Бонн'},{re:/тюбинг|tuebingen/i,val:'tuebingen',label:'Тюбинген'},{re:/дрезден|dresden/i,val:'dresden',label:'Дрезден'},{re:/карлсруэ|karlsruhe/i,val:'karlsruhe',label:'Карлсруэ'},{re:/аахен|aachen/i,val:'aachen',label:'Аахен'},{re:/гамбург|hamburg/i,val:'hamburg',label:'Гамбург'},{re:/кёльн|кельн|cologne/i,val:'cologne',label:'Кёльн'},{re:/франкфурт|frankfurt/i,val:'frankfurt',label:'Франкфурт'},{re:/фрайбург|freiburg/i,val:'freiburg',label:'Фрайбург'}];for(var i=0;i<ctm.length;i++){if(ctm[i].re.test(lo))filters.push({label:ctm[i].label,type:'city',value:ctm[i].val});}if(/\bангл|\bengl|english/i.test(lo))filters.push({label:'Есть англ.',type:'eng',value:true});if(/стипенд|scholarship/i.test(lo))filters.push({label:'Стипендия',type:'tag',value:'scholarship'});return{filters:filters,budget:budget};}
-function applyF(e,filters,budget){if(budget!==null&&(CCOST[e.city]||9999)>budget*1.15)return false;for(var i=0;i<filters.length;i++){var f=filters[i];if(f.type==='budget')continue;if(f.type==='chance'&&e.ch!==f.value)return false;if(f.type==='tag'&&(e.tags||[]).indexOf(f.value)<0)return false;if(f.type==='city'&&e.city!==f.value)return false;if(f.type==='eng'&&!e.eng)return false;}return true;}
+const ADMIN_PASSWORD = "Wawaza1226";
 
-var AF=[],AB=null;
-function renderTags(){var c=document.getElementById('ftags');if(!AF.length&&!AB){c.innerHTML='';return;}c.innerHTML=AF.map(function(f,i){return'<span class="ftag">'+f.label+' <span class="ftag-x" onclick="rmF('+i+')">×</span></span>';}).join('');}
-function rmF(i){AF.splice(i,1);AB=null;renderTags();doSearch();}
-function doSearch(){var q=document.getElementById('q').value.trim();if(!q){AF=[];AB=null;renderTags();rebuild(null,null);return;}var p=parseQ(q);AF=p.filters;AB=p.budget;renderTags();if(AF.length>0||AB!==null){rebuild(function(e){return applyF(e,AF,AB);},null);}else{rebuild(null,null);}}
+let DATA = [];
 
-function rws(arr,col){return(arr||[]).map(function(x){return'<div class="row"'+(col?' style="color:'+col+'"':'')+'>'+x+'</div>';}).join('');}
-function mbd(arr){return(arr||[]).map(function(x){return'<span class="bdg" style="background:#222;color:#888;margin:2px 2px 0 0">'+x+'</span>';}).join('');}
+// =======================
+// загрузка данных
+// =======================
 
-function mkCard(e,sc,ai){var city=CITIES[e.city]||{n:'',c:'mid',cl:''};var pill=sc?'<span class="pill"><span class="dot" style="background:'+CC[city.c]+'"></span>'+city.n+' '+city.cl+'</span>':'';var eng=e.eng?'<span class="bdg blo">Есть англ.</span>':'<span class="bdg" style="background:#1a1a18;color:#555">Только нем.</span>';var top=ai&&ai.reason?'<div class="ag">✓ '+ai.reason+'</div>':'';var bot=ai&&ai.warning?'<div class="aw">⚠ '+ai.warning+'</div>':'';var no=ai&&ai.noR?'<div class="an">✗ '+ai.noR+'</div>':'';var cls=ai?(ai.isNo?'ano':ai.p===1?'a1':ai.p===2?'a2':''):'';var lbl=e._d||e.sub||'';return'<div class="card '+cls+'">'+top+'<div class="ch" onclick="togC(this)"><span class="cr">'+(e.rank||'·')+'</span><div class="ci"><div class="cn">'+e.uni+'</div><div class="cs">'+lbl+'</div></div><div class="bgs">'+pill+'<span class="bdg '+SC[e.st]+'">'+SL[e.st]+'</span>'+eng+'<span class="bdg '+CHC[e.ch]+'">'+CHL[e.ch]+'</span></div><span class="chev">▼</span></div><div class="cb"><div><div class="cl">Язык</div>'+rws(e.lr)+'<div class="cl">Документы</div>'+rws(e.docs)+'<div class="cl">Дедлайн</div><div class="row">'+e.dl+'</div></div><div><div class="cl">Особенности</div>'+rws(e.notes)+'<div class="cl">Плюсы</div>'+rws(e.pros,'#4a9a5a')+'<div class="cl">Минусы</div>'+rws(e.cons,'#c84a4a')+'<div class="cl">Магистратура</div><div style="margin-top:2px">'+mbd(e.ms)+'</div></div></div>'+bot+no+'</div>';}
+async function loadData() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/universities?select=*`, {
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`
+    }
+  });
 
-function bDir(fn,am){var h='';for(var i=0;i<DATA.length;i++){var d=DATA[i];var ents=fn?d.entries.filter(fn):d.entries.slice();if(am){ents=d.entries.slice();ents.sort(function(a,b){var ka=a.uni+'::'+d.dir,kb=b.uni+'::'+d.dir;var da=am[ka]||null,db=am[kb]||null;var pa=da&&!da.isNo?da.p:50,pb=db&&!db.isNo?db.p:50;var na=da&&da.isNo?1:0,nb=db&&db.isNo?1:0;return(na-nb)||(pa-pb);});}if(!ents.length)continue;var o=fn||am?'open':'';var cnt=am?ents.filter(function(e){var k=e.uni+'::'+d.dir;return am[k]&&!am[k].isNo;}).length:ents.length;var meta=am?cnt+' подходит':cnt+' вузов';var cards=ents.map(function(e){var ai=am?(am[e.uni+'::'+d.dir]||null):null;return mkCard(Object.assign({},e,{_d:d.dir}),true,ai);}).join('');h+='<div class="sh" onclick="togS(this)"><span class="st">'+d.dir+'</span><span class="sm">'+meta+'</span><span class="chev '+o+'">▼</span></div><div class="sb '+o+'">'+cards+'</div>';}document.getElementById('vdir').innerHTML=h||'<div class="empty">Ничего не найдено</div>';}
-function bCity(fn,am){var bC={};for(var i=0;i<DATA.length;i++){for(var j=0;j<DATA[i].entries.length;j++){var e=DATA[i].entries[j];var ai=am?(am[e.uni+'::'+DATA[i].dir]||null):null;if(fn&&!fn(e))continue;if(am&&!ai)continue;if(!bC[e.city])bC[e.city]=[];bC[e.city].push({e:Object.assign({},e,{_d:DATA[i].dir}),ai:ai});}}var h='';for(var i=0;i<CORD.length;i++){var cid=CORD[i];if(!bC[cid]||!bC[cid].length)continue;var city=CITIES[cid];var sorted=bC[cid].slice().sort(function(a,b){if(am){var pa=a.ai&&!a.ai.isNo?a.ai.p:50,pb=b.ai&&!b.ai.isNo?b.ai.p:50;return pa-pb;}return SV[a.e.st]-SV[b.e.st];});var o=fn||am?'open':'';var cards=sorted.map(function(x,idx){return mkCard(Object.assign({},x.e,{rank:idx+1}),false,x.ai);}).join('');h+='<div class="sh" onclick="togS(this)"><span class="st">'+city.n+'</span><span class="sm">'+city.l+' · <span style="color:'+CC[city.c]+'">'+city.cl+'</span></span><span class="chev '+o+'">▼</span></div><div class="sb '+o+'">'+cards+'</div>';}document.getElementById('vcity').innerHTML=h||'<div class="empty">Ничего не найдено</div>';}
-function bUni(fn,am){var bU={};for(var i=0;i<DATA.length;i++){for(var j=0;j<DATA[i].entries.length;j++){var e=DATA[i].entries[j];var ai=am?(am[e.uni+'::'+DATA[i].dir]||null):null;if(fn&&!fn(e))continue;if(am&&!ai)continue;if(!bU[e.uni]){bU[e.uni]=Object.assign({},e,{dirs:[],bAI:null});}bU[e.uni].dirs.push(DATA[i].dir);if(ai&&!ai.isNo&&(!bU[e.uni].bAI||bU[e.uni].bAI.isNo||(ai.p||99)<(bU[e.uni].bAI.p||99)))bU[e.uni].bAI=ai;else if(ai&&ai.isNo&&!bU[e.uni].bAI)bU[e.uni].bAI=ai;}}var vals=Object.keys(bU).map(function(k){return bU[k];});vals.sort(function(a,b){if(am){var pa=a.bAI&&!a.bAI.isNo?a.bAI.p:50,pb=b.bAI&&!b.bAI.isNo?b.bAI.p:50;return pa-pb;}return SV[a.st]-SV[b.st]||CITIES[a.city].n.localeCompare(CITIES[b.city].n);});var h='';for(var i=0;i<vals.length;i++){var v=vals[i];var city=CITIES[v.city];var dH=v.dirs.map(function(d){return'<span class="bdg" style="background:#222;color:#888;margin:2px 2px 0 0">'+d+'</span>';}).join('');var eng=v.eng?'<span class="bdg blo">Есть англ.</span>':'<span class="bdg" style="background:#1a1a18;color:#555">Только нем.</span>';var ai=v.bAI;var top=ai&&ai.reason?'<div class="ag">✓ '+ai.reason+'</div>':'';var bot=ai&&ai.warning?'<div class="aw">⚠ '+ai.warning+'</div>':'';var no=ai&&ai.noR?'<div class="an">✗ '+ai.noR+'</div>':'';var cls=ai?(ai.isNo?'ano':ai.p===1?'a1':ai.p===2?'a2':''):'';h+='<div class="card '+cls+'">'+top+'<div class="ch" onclick="togC(this)"><span class="cr">'+(i+1)+'</span><div class="ci"><div class="cn">'+v.uni+'</div><div class="cs">'+city.n+' · <span style="color:'+CC[city.c]+'">'+city.cl+'</span></div></div><div class="bgs"><span class="bdg '+SC[v.st]+'">'+SL[v.st]+'</span>'+eng+'<span class="bdg '+CHC[v.ch]+'">'+CHL[v.ch]+'</span></div><span class="chev">▼</span></div><div class="cb"><div><div class="cl">Направления</div><div style="margin-bottom:6px">'+dH+'</div><div class="cl">Язык</div>'+rws(v.lr)+'<div class="cl">Документы</div>'+rws(v.docs)+'<div class="cl">Дедлайн</div><div class="row">'+v.dl+'</div></div><div><div class="cl">Особенности</div>'+rws(v.notes)+'<div class="cl">Плюсы</div>'+rws(v.pros,'#4a9a5a')+'<div class="cl">Минусы</div>'+rws(v.cons,'#c84a4a')+'<div class="cl">Магистратура</div><div style="margin-top:2px">'+mbd(v.ms)+'</div></div></div>'+bot+no+'</div>';}document.getElementById('vuni').innerHTML=h||'<div class="empty">Ничего не найдено</div>';}
-function rebuild(fn,am){bDir(fn,am);bCity(fn,am);bUni(fn,am);}
-function togS(h){var b=h.nextElementSibling,c=h.querySelector('.chev');var o=b.classList.toggle('open');if(c)c.classList.toggle('open',o);}
-function togC(h){var b=h.nextElementSibling;if(!b)return;var c=h.querySelector('.chev');var o=b.classList.toggle('open');if(c)c.classList.toggle('open',o);b.style.display=o?'grid':'none';}
-function swV(n,el){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});document.getElementById('v'+n).classList.add('active');}
-function setL(lang,el){G.lang=lang;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.remove('active');});el.classList.add('active');var h=document.getElementById('hint');h.textContent=G.ai?AHINTS[lang]:HINTS[lang];var q=document.getElementById('q').value;if(q.trim()&&!G.ai)doSearch();}
-function onIn(v){if(G.ai){clearTimeout(G.timer);return;}clearTimeout(G.timer);G.timer=setTimeout(function(){doSearch();},300);}
-function togAI(){G.ai=!G.ai;var btn=document.getElementById('aibtn'),sb=document.getElementById('sbtn'),h=document.getElementById('hint'),bar=document.getElementById('aibar'),inp=document.getElementById('q');if(G.ai){btn.classList.add('active');btn.textContent='✦ AI';sb.classList.add('visible');h.textContent=AHINTS[G.lang];h.className='hint ai-mode';inp.placeholder='Опишите клиента...';inp.focus();}else{btn.classList.remove('active');btn.textContent='✦ AI';sb.classList.remove('visible');h.textContent=HINTS[G.lang];h.className='hint';bar.style.display='none';inp.placeholder='Поиск... (медицина, 800 евро, хорошие шансы)';var q=inp.value;if(q.trim())doSearch();else rebuild(null,null);}}
-function sendAI(){var v=document.getElementById('q').value.trim();if(v.length>2)runAI(v);}
+  const rows = await res.json();
 
-async function runAI(query) {
-  var btn=document.getElementById('aibtn'), sb=document.getElementById('sbtn');
-  btn.innerHTML='<span class="dots"><span></span><span></span><span></span></span>';
-  sb.textContent='…'; sb.style.pointerEvents='none';
+  const grouped = {};
 
-  var cat = DATA.map(function(d){ return { dir:d.dir, entries:d.entries.map(function(e){ return { id:e.uni+'::'+d.dir, uni:e.uni, city:CITIES[e.city].n, status:SL[e.st], chance:CHL[e.ch], eng:e.eng, cost:CITIES[e.city].cl, costNum:CCOST[e.city], tags:e.tags, pros:e.pros, cons:e.cons }; })}; });
+  rows.forEach(r => {
+    if (!grouped[r.direction]) grouped[r.direction] = [];
 
-  var sys = 'Ты — куратор по поступлению в немецкие вузы.\nКАТАЛОГ: ' + JSON.stringify(cat) + '\nПодбери варианты под описание клиента.\nВерни ТОЛЬКО JSON без markdown:\n{"summary":"1-2 предложения","top":[{"id":"Вуз::Направление","p":1,"reason":"почему подходит","warning":"риск или null"}],"no":[{"id":"Вуз::Направление","reason":"почему не подходит"}]}\np: 1=отлично, 2=с оговорками, 3=возможный. Макс 6 в top, 2-3 в no.';
+    grouped[r.direction].push(r);
+  });
 
-  try {
-    var resp = await fetch('/api/ai', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ system: sys, userMessage: query })
-    });
-    var data = await resp.json();
-    if (data.error) throw new Error(data.error);
-    var raw = data.text || '';
-    var parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
-    var bar = document.getElementById('aibar');
-    if (parsed.summary) { bar.innerHTML = '<strong>Анализ:</strong> ' + parsed.summary; bar.style.display = 'block'; }
-    var am = {};
-    (parsed.top||[]).forEach(function(x){ am[x.id]={isNo:false,p:x.p,reason:x.reason,warning:x.warning||null}; });
-    (parsed.no||[]).forEach(function(x){ am[x.id]={isNo:true,p:99,noR:x.reason}; });
-    rebuild(null, am);
-  } catch(err) {
-    var bar = document.getElementById('aibar');
-    bar.textContent = 'Ошибка: ' + (err.message || 'попробуйте снова');
-    bar.style.display = 'block';
-  }
-  btn.classList.add('active'); btn.textContent = '✦ AI';
-  sb.textContent = '↵'; sb.style.pointerEvents = '';
+  DATA = grouped;
+
+  render();
 }
 
-rebuild(null, null);
+// =======================
+// рендер
+// =======================
+
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+
+  Object.keys(DATA).forEach(dir => {
+    const section = document.createElement('div');
+
+    section.innerHTML = `<h2>${dir}</h2>`;
+
+    DATA[dir].forEach(u => {
+      section.innerHTML += `
+        <div class="card">
+          <b>${u.uni}</b> (${u.city})<br>
+          шанс: ${u.chance}
+        </div>
+      `;
+    });
+
+    app.appendChild(section);
+  });
+}
+
+// =======================
+// админка
+// =======================
+
+document.getElementById('adminBtn').onclick = () => {
+  const panel = document.getElementById('adminPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+};
+
+function checkAdmin() {
+  const pass = document.getElementById('adminPass').value;
+
+  if (pass === ADMIN_PASSWORD) {
+    document.getElementById('adminContent').style.display = 'block';
+  } else {
+    alert("Wrong password");
+  }
+}
+
+async function addUni() {
+  const uni = document.getElementById('uni').value;
+  const city = document.getElementById('city').value;
+  const direction = document.getElementById('direction').value;
+
+  await fetch(`${SUPABASE_URL}/rest/v1/universities`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`
+    },
+    body: JSON.stringify({
+      uni,
+      city,
+      direction,
+      status: 's',
+      chance: 'mid',
+      eng: true
+    })
+  });
+
+  alert("Добавлено");
+  loadData();
+}
+
+// старт
+loadData();
+
 </script>
+
 </body>
 </html>
