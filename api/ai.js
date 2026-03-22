@@ -11,9 +11,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'ANTHROPIC_API_KEY не настроен' });
+    return res.status(500).json({ error: 'GROQ_API_KEY не настроен' });
   }
 
   let system = '';
@@ -33,19 +33,19 @@ export default async function handler(req, res) {
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  const callClaude = async () => {
-    return fetch('https://api.anthropic.com/v1/messages', {
+  const callGroq = async () => {
+    return fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
+        'Authorization': 'Bearer ' + apiKey
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-6',
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.2,
         max_tokens: 2000,
-        system: system,
         messages: [
+          { role: 'system', content: system },
           { role: 'user', content: userMessage }
         ]
       })
@@ -53,39 +53,39 @@ export default async function handler(req, res) {
   };
 
   try {
-    let claudeResp;
-    let claudeData;
+    let groqResp;
+    let groqData;
 
     // Retry up to 2 times on 429 with exponential backoff
     for (let attempt = 0; attempt <= 2; attempt++) {
-      claudeResp = await callClaude();
-      claudeData = await claudeResp.json().catch(() => null);
+      groqResp = await callGroq();
+      groqData = await groqResp.json().catch(() => null);
 
-      if (claudeResp.status !== 429) break;
+      if (groqResp.status !== 429) break;
 
       if (attempt < 2) {
         await sleep(2000 * Math.pow(2, attempt)); // 2s, 4s
       }
     }
 
-    if (!claudeResp.ok) {
-      if (claudeResp.status === 429) {
+    if (!groqResp.ok) {
+      if (groqResp.status === 429) {
         return res.status(429).json({
           error: 'Лимит запросов к AI исчерпан. Попробуйте через несколько минут.',
           isQuotaError: true
         });
       }
-      const msg = claudeData?.error?.message || ('Claude статус ' + claudeResp.status);
+      const msg = groqData?.error?.message || ('Groq статус ' + groqResp.status);
       return res.status(500).json({ error: msg });
     }
 
-    const rawText = claudeData?.content?.[0]?.text || '';
+    const rawText = groqData?.choices?.[0]?.message?.content || '';
 
     const first = rawText.indexOf('{');
     const last  = rawText.lastIndexOf('}');
 
     if (first === -1 || last === -1 || last <= first) {
-      return res.status(500).json({ error: 'Claude не вернул JSON', raw: rawText.slice(0, 300) });
+      return res.status(500).json({ error: 'AI не вернул JSON', raw: rawText.slice(0, 300) });
     }
 
     const jsonText = rawText.slice(first, last + 1);
@@ -93,7 +93,7 @@ export default async function handler(req, res) {
     try {
       JSON.parse(jsonText);
     } catch {
-      return res.status(500).json({ error: 'Невалидный JSON от Claude', raw: jsonText.slice(0, 300) });
+      return res.status(500).json({ error: 'Невалидный JSON от AI', raw: jsonText.slice(0, 300) });
     }
 
     return res.status(200).json({ text: jsonText });
