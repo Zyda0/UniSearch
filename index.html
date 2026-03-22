@@ -281,15 +281,21 @@ function makeEntry(r, idx) {
     ch: r.chance || 'mid',
     sub: r.direction || '',
     dl: r.deadline || '',
+
+    lr: safeArray(r.language || []), // ✅ фикс
+
     docs: safeArray(r.docs),
     notes: safeArray(r.features || r.notes),
-    ms: safeArray(r.master || r.ms || r.specialties || []),
+
+    ms: safeArray(r.master || []), // ✅ фикс
+
     pros: safeArray(r.pros),
     cons: safeArray(r.cons),
+
     tags: safeArray(r.tags || []).map(String)
   };
 }
-
+  
 function transformRows(rows) {
   const grouped = [];
   const idxMap = new Map();
