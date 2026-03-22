@@ -338,8 +338,11 @@ function mkCard(e,sc,ai){
 }
 
 function bDir(fn,am){
+  var cityOrder=CORD.slice();
+  if(am){cityOrder.sort(function(a,b){var ra=bC[a]?bC[a].reduce(function(m,x){return x.ai&&!x.ai.isNo?Math.min(m,x.ai.p||99):m;},99):99;var rb=bC[b]?bC[b].reduce(function(m,x){return x.ai&&!x.ai.isNo?Math.min(m,x.ai.p||99):m;},99):99;return ra-rb;});}
   var h='';
-  for(var i=0;i<DATA.length;i++){
+  for(var i=0;i<cityOrder.length;i++){var cid=cityOrder[i];
+
     var d=DATA[i];
     var ents=fn?d.entries.filter(fn):d.entries.slice();
     if(am){ents=d.entries.slice();ents.sort(function(a,b){var ka=a.uni+'::'+d.dir,kb=b.uni+'::'+d.dir;var da=am[ka]||null,db=am[kb]||null;var pa=da&&!da.isNo?da.p:50,pb=db&&!db.isNo?db.p:50;var na=da&&da.isNo?1:0,nb=db&&db.isNo?1:0;return(na-nb)||(pa-pb);});}
