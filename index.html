@@ -222,7 +222,6 @@ var SV={e:0,t:1,s:2};
 var CORD=['munich','berlin','heidelberg','bonn','tuebingen','karlsruhe','dresden','aachen','hamburg','cologne','frankfurt','freiburg'];
 var SUPABASE_URL = 'https://hbkltwkspfbnjoltfxby.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_LH9wJzvN8Img4roHKalcKQ_CiRxtp3d';
-var ADMIN_PASSWORD = 'Wawaza1226';
 
 var DATA = [];
 var ALL_ROWS = [];
@@ -465,7 +464,6 @@ async function addUni() {
     deadline:document.getElementById('fDeadline').value.trim(),
     docs:splitLines(document.getElementById('fDocs').value),
     features:splitLines(document.getElementById('fNotes').value),
-    notes:splitLines(document.getElementById('fNotes').value),
     pros:splitLines(document.getElementById('fPros').value),
     cons:splitLines(document.getElementById('fCons').value),
     master:splitLines(document.getElementById('fMaster').value),
@@ -485,7 +483,7 @@ async function addUni() {
 
 document.getElementById('adminFab').addEventListener('click',function(){document.getElementById('adminPanel').classList.toggle('open');});
 document.getElementById('adminClose').addEventListener('click',function(){openAdmin(false);});
-document.getElementById('adminLoginBtn').addEventListener('click',function(){var pass=document.getElementById('adminPass').value;if(pass===ADMIN_PASSWORD){G.admin=true;showAdminForm();}else{document.getElementById('adminStatus').textContent='Неверный пароль';document.getElementById('adminStatus').style.color='#c84a4a';}});
+document.getElementById('adminLoginBtn').addEventListener('click',async function(){var pass=document.getElementById('adminPass').value;var statusEl=document.getElementById('adminStatus');statusEl.textContent='Проверяю...';statusEl.style.color='#888';try{var r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pass})});var d=await r.json().catch(function(){return{};});if(r.ok){G.admin=true;showAdminForm();}else{statusEl.textContent=d.error||'Неверный пароль';statusEl.style.color='#c84a4a';}}catch(e){statusEl.textContent='Ошибка подключения к серверу';statusEl.style.color='#c84a4a';}});
 document.getElementById('addUniBtn').addEventListener('click',addUni);
 document.getElementById('refreshBtn').addEventListener('click',function(){loadData();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')openAdmin(false);});

@@ -90,10 +90,15 @@ export default async function handler(req, res) {
 
     const jsonText = rawText.slice(first, last + 1);
 
+    let parsed;
     try {
-      JSON.parse(jsonText);
+      parsed = JSON.parse(jsonText);
     } catch {
       return res.status(500).json({ error: 'Невалидный JSON от AI', raw: jsonText.slice(0, 300) });
+    }
+
+    if (typeof parsed !== 'object' || Array.isArray(parsed) || parsed === null) {
+      return res.status(500).json({ error: 'AI вернул неверную структуру JSON (ожидается объект)', raw: jsonText.slice(0, 300) });
     }
 
     return res.status(200).json({ text: jsonText });
