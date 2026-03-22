@@ -386,46 +386,15 @@ async function runAI(query) {
   sb.textContent='…'; sb.style.pointerEvents='none';
   bar.style.display='none';
 
-  // Умная фильтрация: определяем направление из запроса и берём только нужные вузы
-  var qLow=query.toLowerCase();
-  var DMAP=[
-    {re:/медицин|medicine|medizin/i,dir:'Медицина'},
-    {re:/computer science|cs|информатик|informatik/i,dir:'Computer Science / AI'},
-    {re:/machine learning|ml|ai|нейросет/i,dir:'Machine Learning / AI'},
-    {re:/машиностроен|инженер|maschinenbau|mechanical/i,dir:'Машиностроение / Инженерия'},
-    {re:/экономик|wirtschaft|economics|финанс|finance/i,dir:'Финансы / Экономика'},
-    {re:/право|law|jura/i,dir:'Право'},
-    {re:/биолог|biology|экологи|ecology/i,dir:'Экология / Биология'},
-    {re:/психолог|psychology/i,dir:'Психология'},
-    {re:/фармац|pharmacy|pharmazie/i,dir:'Фармация'},
-    {re:/архитект|дизайн|design|kunst/i,dir:'Архитектура / Дизайн'},
-    {re:/физик|математик|physics|mathematics/i,dir:'Физика / Математика'},
-    {re:/кибербез|cybersecurity|it.безопас/i,dir:'IT-Безопасность / Кибербезопасность'},
-  ];
-  var matchedDir=null;
-  for(var _i=0;_i<DMAP.length;_i++){if(DMAP[_i].re.test(qLow)){matchedDir=DMAP[_i].dir;break;}}
+  var cat=DATA.map(function(d){return{dir:d.dir,entries:d.entries.map(function(e){return{id:e.uni+'::'+d.dir,uni:e.uni,city:e.city,cost:CCOST[e.city]||999,status:e.st,chance:e.ch,eng:!!e.eng,tags:(e.tags||[]).slice(0,6)};})};});
 
-  // Фильтруем DATA по направлению (если найдено) или берём все но сжато
-  var filteredData=DATA;
-  if(matchedDir){filteredData=DATA.filter(function(d){return d.dir.indexOf(matchedDir.split(' / ')[0])!==-1||matchedDir.indexOf(d.dir.split(' / ')[0])!==-1;});}
-  if(!filteredData.length)filteredData=DATA;
-
-  // Бюджет из запроса
-  var budgetMatch=qLow.match(/(\d{3,5})\s*(?:евро|euro|€)/);
-  var budget=budgetMatch?parseInt(budgetMatch[1]):null;
-
-  // Формируем компактный каталог
-  var cat=[];
-  filteredData.forEach(function(d){
-    d.entries.forEach(function(e){
-      if(budget&&(CCOST[e.city]||9999)>budget*1.2)return;
-      cat.push({id:e.uni+'::'+d.dir,u:e.uni,c:e.city,s:e.st,ch:e.ch,e:!!e.eng,co:CCOST[e.city]||999});
-    });
-  });
-  // Если всё ещё много — обрезаем
-  if(cat.length>80)cat=cat.slice(0,80);
-
-  var sys='Куратор нем.вузов.КАТАЛОГ:'+JSON.stringify(cat)+' s:e=элитный,t=технич,s=сильный.ch:low=низкие,mid=средние,hi=высокие.e=true есть англ.Подбери подходящие под запрос клиента.ТОЛЬКО JSON:{"summary":"1-2 предл","top":[{"id":"...","p":1,"reason":"...","warning":null}],"no":[{"id":"...","reason":"..."}]}p:1=отлично,2=оговорки,3=возможный.Макс 5 top,2 no.id точно как в каталоге.';
+  var sys='Ты — куратор по поступлению в немецкие вузы. '+
+    'КАТАЛОГ: '+JSON.stringify(cat)+' '+
+    'Стоимость жизни: munich=1400€, berlin=1200€, frankfurt=1300€, hamburg=1200€, heidelberg=950€, cologne=950€, karlsruhe=900€, bonn=900€, aachen=850€, freiburg=900€, tuebingen=750€, dresden=750€. '+
+    'chance: low=низкие шансы, mid=средние, hi=высокие. status: e=элитный, t=технический, s=сильный. eng=true есть англ.программы. '+
+    'Подбери варианты под клиента. Верни ТОЛЬКО JSON без markdown: '+
+    '{"summary":"1-2 предложения","top":[{"id":"uni::dir","p":1,"reason":"почему подходит","warning":null}],"no":[{"id":"uni::dir","reason":"почему нет"}]} '+
+    'p:1=отлично,2=с оговорками,3=возможный. Верни ВСЕ подходящие варианты в top (без лимита), только явно неподходящие в no (макс 3). id точно как в каталоге.';
 
   try {
     var resp=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:sys,userMessage:query})});
