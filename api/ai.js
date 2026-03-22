@@ -58,18 +58,34 @@ export default async function handler(request) {
       }
     );
 
-    const data = await response.json();
+    const data = await response.json().catch(() => null);
 
     if (!response.ok) {
       return new Response(
-        JSON.stringify({ error: data.error?.message || 'Gemini error' }),
+        JSON.stringify({ error: data?.error?.message || 'Gemini error' }),
         { status: response.status, headers: corsHeaders }
       );
     }
 
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const stripped = String(rawText).replace(/```json|```/gi, '').trim();
 
-    return new Response(JSON.stringify({ text }), {
+    const first = stripped.indexOf('{');
+    const last = stripped.lastIndexOf('}');
+    if (first === -1 || last === -1 || last <= first) {
+      return new Response(
+        JSON.stringify({
+          error: 'Gemini returned non-JSON response',
+          raw: rawText.slice(0, 500),
+        }),
+        { status: 500, headers: corsHeaders }
+      );
+    }
+
+    const jsonText = stripped.slice(first, last + 1);
+    JSON.parse(jsonText);
+
+    return new Response(JSON.stringify({ text: jsonText }), {
       status: 200,
       headers: corsHeaders,
     });
