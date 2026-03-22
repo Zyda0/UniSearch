@@ -356,8 +356,10 @@ function bDir(fn,am){
 function bCity(fn,am){
   var bC={};
   for(var i=0;i<DATA.length;i++){for(var j=0;j<DATA[i].entries.length;j++){var e=DATA[i].entries[j];var ai=am?(am[e.uni+'::'+DATA[i].dir]||null):null;if(fn&&!fn(e))continue;if(am&&!ai)continue;if(!bC[e.city])bC[e.city]=[];bC[e.city].push({e:Object.assign({},e,{_d:DATA[i].dir}),ai:ai});}}
+  var cityOrder=CORD.slice();
+  if(am){cityOrder.sort(function(a,b){var ra=bC[a]?bC[a].reduce(function(m,x){return x.ai&&!x.ai.isNo?Math.min(m,x.ai.p||99):m;},99):99;var rb=bC[b]?bC[b].reduce(function(m,x){return x.ai&&!x.ai.isNo?Math.min(m,x.ai.p||99):m;},99):99;return ra-rb;});}
   var h='';
-  for(var i=0;i<CORD.length;i++){var cid=CORD[i];if(!bC[cid]||!bC[cid].length)continue;var city=CITIES[cid];var sorted=bC[cid].slice().sort(function(a,b){if(am){var pa=a.ai&&!a.ai.isNo?a.ai.p:50,pb=b.ai&&!b.ai.isNo?b.ai.p:50;return pa-pb;}return SV[a.e.st]-SV[b.e.st];});var o=fn||am?'open':'';var cards=sorted.map(function(x,idx){return mkCard(Object.assign({},x.e,{rank:idx+1}),false,x.ai);}).join('');h+='<div class="sh" onclick="togS(this)"><span class="st">'+city.n+'</span><span class="sm">'+city.l+' · <span style="color:'+CC[city.c]+'">'+city.cl+'</span></span><span class="chev '+o+'">▼</span></div><div class="sb '+o+'">'+cards+'</div>';}
+  for(var i=0;i<cityOrder.length;i++){var cid=cityOrder[i];if(!bC[cid]||!bC[cid].length)continue;var city=CITIES[cid];var sorted=bC[cid].slice().sort(function(a,b){if(am){var pa=a.ai&&!a.ai.isNo?a.ai.p:50,pb=b.ai&&!b.ai.isNo?b.ai.p:50;return pa-pb;}return SV[a.e.st]-SV[b.e.st];});var o=fn||am?'open':'';var cards=sorted.map(function(x,idx){return mkCard(Object.assign({},x.e,{rank:idx+1}),false,x.ai);}).join('');h+='<div class="sh" onclick="togS(this)"><span class="st">'+city.n+'</span><span class="sm">'+city.l+' · <span style="color:'+CC[city.c]+'">'+city.cl+'</span></span><span class="chev '+o+'">▼</span></div><div class="sb '+o+'">'+cards+'</div>';}
   document.getElementById('vcity').innerHTML=h||'<div class="empty">Ничего не найдено</div>';
 }
 
