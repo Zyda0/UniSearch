@@ -475,35 +475,70 @@ async function runAI(query) {
   var btn = document.getElementById('aibtn');
   var sb  = document.getElementById('sbtn');
   var bar = document.getElementById('aibar');
-
   btn.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
-  sb.textContent = '…';
-  sb.style.pointerEvents = 'none';
+  sb.textContent = '…'; sb.style.pointerEvents = 'none';
   bar.style.display = 'none';
 
   var cat = DATA.map(function(d) {
     return {
       dir: d.dir,
       entries: d.entries.map(function(e) {
-        var city = CITIES[e.city] || { n: e.city, cl: '' };
         return {
-          id:      e.uni + '::' + d.dir,
-          uni:     e.uni,
-          city:    city.n,
-          cityKey: e.city,
-          status:  SL[e.st]  || e.st,
-          chance:  CHL[e.ch] || e.ch,
-          eng:     !!e.eng,
-          cost:    city.cl,
-          costNum: CCOST[e.city] || 999,
-          tags:    e.tags  || [],
-          pros:    e.pros  || [],
-          cons:    e.cons  || [],
-          lr:      e.lr    || []
+          id:     e.uni + '::' + d.dir,
+          uni:    e.uni,
+          city:   e.city,
+          cost:   CCOST[e.city] || 999,
+          status: e.st,
+          chance: e.ch,
+          eng:    !!e.eng,
+          tags:   (e.tags || []).slice(0, 6)
         };
       })
     };
   });
+
+  var sys =
+    'Ты — куратор по поступлению в немецкие вузы. ' +
+    'КАТАЛОГ: ' + JSON.stringify(cat) + ' ' +
+    'Стоимость жизни: munich=1400€, berlin=1200€, frankfurt=1300€, hamburg=1200€, heidelberg=950€, cologne=950€, karlsruhe=900€, bonn=900€, aachen=850€, freiburg=900€, tuebingen=750€, dresden=750€. ' +
+    'chance: low=низкие шансы, mid=средние, hi=высокие. status: e=элитный, t=технический, s=сильный. eng=true есть англ.программы. ' +
+    'Подбери варианты под клиента. Верни ТОЛЬКО JSON без markdown и пояснений: ' +
+    '{"summary":"1-2 предложения","top":[{"id":"uni::dir","p":1,"reason":"почему подходит","warning":null}],"no":[{"id":"uni::dir","reason":"почему нет"}]} ' +
+    'p:1=отлично,2=с оговорками,3=возможный. Макс 5 в top, 2 в no. id точно как в каталоге.';
+
+  try {
+    var resp = await fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ system: sys, userMessage: query })
+    });
+    if (!resp.ok) {
+      var ed = await resp.json().catch(function(){ return {}; });
+      throw new Error(ed.error || 'Сервер ' + resp.status);
+    }
+    var data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    var raw = data.text || '';
+    var fi = raw.indexOf('{'), la = raw.lastIndexOf('}');
+    if (fi === -1 || la === -1) throw new Error('AI не вернул JSON');
+    var parsed = JSON.parse(raw.slice(fi, la + 1));
+    if (parsed.summary) {
+      bar.innerHTML = '<strong>Анализ:</strong> ' + parsed.summary;
+      bar.style.color = '#5bb3d0';
+      bar.style.display = 'block';
+    }
+    var am = {};
+    (parsed.top || []).forEach(function(x){ am[x.id] = { isNo:false, p:x.p||1, reason:x.reason||'', warning:x.warning||null }; });
+    (parsed.no  || []).forEach(function(x){ am[x.id] = { isNo:true,  p:99,     noR:x.reason||'' }; });
+    rebuild(null, am);
+  } catch(err) {
+    bar.textContent = '⚠ Ошибка AI: ' + (err.message || 'попробуйте снова');
+    bar.style.color = '#c84a4a';
+    bar.style.display = 'block';
+  }
+  btn.classList.add('active'); btn.textContent = '✦ AI';
+  sb.textContent = '↵'; sb.style.pointerEvents = '';
+}
 
   var sys =
     'Ты — эксперт-куратор по поступлению в немецкие университеты.\n' +
