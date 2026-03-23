@@ -289,18 +289,20 @@ async function loadData() {
 }
 
 function parseQ(q) {
-  var lo=q.toLowerCase(); var filters=[]; var budget=null;
+  var lo=q.toLowerCase(); var filters=[]; var budget=null; var rest=lo;
   var re=/(\d{3,5})\s*(?:евро|euro|eur|€)/gi, m;
   while((m=re.exec(lo))!==null){var n=parseInt(m[1]);if(n>=300&&n<=5000){budget=n;filters.push({label:'≤'+n+'€/мес',type:'budget',value:n});}}
-  var cm=[{re:/хорош|высок.{0,10}шанс|низк.{0,10}конкурс|good chance|висок.{0,10}шанс/i,val:'hi',label:'Шансы: высокие'},{re:/средн.{0,10}шанс|medium chance/i,val:'mid',label:'Шансы: средние'},{re:/низк.{0,10}шанс|высок.{0,10}конкурс|low chance/i,val:'low',label:'Шансы: низкие'}];
-  for(var i=0;i<cm.length;i++){if(cm[i].re.test(lo)){filters.push({label:cm[i].label,type:'chance',value:cm[i].val});break;}}
-  var dm=[{re:/медицин|medicine|medizin/i,val:'medicine',label:'Медицина'},{re:/computer science|cs\b|информатик|інформатик|informatik/i,val:'cs',label:'CS'},{re:/machine learning|ml\b|нейросет/i,val:'ml',label:'ML'},{re:/\bai\b|искусств.{0,5}интелл/i,val:'ai',label:'AI'},{re:/машиностроен|инженер|maschinenbau|mechanical/i,val:'mechanical',label:'Машиностроение'},{re:/экономик|wirtschaft|economics/i,val:'economics',label:'Экономика'},{re:/финанс|finance/i,val:'finance',label:'Финансы'},{re:/биолог|biology/i,val:'biology',label:'Биология'},{re:/экологи|ecology/i,val:'ecology',label:'Экология'},{re:/право|law\b/i,val:'law',label:'Право'},{re:/физик|physics/i,val:'physics',label:'Физика'},{re:/математик|mathematics/i,val:'mathematics',label:'Математика'}];
-  for(var i=0;i<dm.length;i++){if(dm[i].re.test(lo))filters.push({label:dm[i].label,type:'tag',value:dm[i].val});}
-  var ctm=[{re:/мюнхен|münchen|munich/i,val:'munich',label:'Мюнхен'},{re:/берлин|berlin/i,val:'berlin',label:'Берлин'},{re:/гейдельберг|heidelberg/i,val:'heidelberg',label:'Гейдельберг'},{re:/\bбонн\b|bonn/i,val:'bonn',label:'Бонн'},{re:/тюбинг|tuebingen/i,val:'tuebingen',label:'Тюбинген'},{re:/дрезден|dresden/i,val:'dresden',label:'Дрезден'},{re:/карлсруэ|karlsruhe/i,val:'karlsruhe',label:'Карлсруэ'},{re:/аахен|aachen/i,val:'aachen',label:'Аахен'},{re:/гамбург|hamburg/i,val:'hamburg',label:'Гамбург'},{re:/кёльн|кельн|cologne/i,val:'cologne',label:'Кёльн'},{re:/франкфурт|frankfurt/i,val:'frankfurt',label:'Франкфурт'},{re:/фрайбург|freiburg/i,val:'freiburg',label:'Фрайбург'}];
-  for(var i=0;i<ctm.length;i++){if(ctm[i].re.test(lo))filters.push({label:ctm[i].label,type:'city',value:ctm[i].val});}
-  if(/\bангл|\bengl|english/i.test(lo))filters.push({label:'Есть англ.',type:'eng',value:true});
-  if(/стипенд|scholarship/i.test(lo))filters.push({label:'Стипендия',type:'tag',value:'scholarship'});
-  return {filters:filters, budget:budget};
+  rest=rest.replace(/\d{3,5}\s*(?:евро|euro|eur|€)/gi,' ');
+  var cm=[{re:/хорош\w*|высок\w*.{0,6}шанс\w*|низк\w*.{0,6}конкурс\w*|good chance|висок\w*.{0,6}шанс\w*/i,val:'hi',label:'Шансы: высокие'},{re:/средн\w*.{0,6}шанс\w*|medium chance/i,val:'mid',label:'Шансы: средние'},{re:/низк\w*.{0,6}шанс\w*|высок\w*.{0,6}конкурс\w*|low chance/i,val:'low',label:'Шансы: низкие'}];
+  for(var i=0;i<cm.length;i++){if(cm[i].re.test(lo)){filters.push({label:cm[i].label,type:'chance',value:cm[i].val});rest=rest.replace(cm[i].re,' ');break;}}
+  var dm=[{re:/медицин\w*|medicine|medizin/i,val:'medicine',label:'Медицина'},{re:/computer science|\bcs\b|информатик\w*|інформатик\w*|informatik/i,val:'cs',label:'CS'},{re:/machine learning|\bml\b|нейросет\w*/i,val:'ml',label:'ML'},{re:/\bai\b|искусств\w*.{0,5}интелл\w*/i,val:'ai',label:'AI'},{re:/машиностроен\w*|инженер\w*|maschinenbau|mechanical/i,val:'mechanical',label:'Машиностроение'},{re:/экономик\w*|wirtschaft|economics/i,val:'economics',label:'Экономика'},{re:/финанс\w*|finance/i,val:'finance',label:'Финансы'},{re:/биолог\w*|biology/i,val:'biology',label:'Биология'},{re:/экологи\w*|ecology/i,val:'ecology',label:'Экология'},{re:/право\w*|\blaw\b/i,val:'law',label:'Право'},{re:/физик\w*|physics/i,val:'physics',label:'Физика'},{re:/математик\w*|mathematics/i,val:'mathematics',label:'Математика'}];
+  for(var i=0;i<dm.length;i++){if(dm[i].re.test(lo)){filters.push({label:dm[i].label,type:'tag',value:dm[i].val});rest=rest.replace(dm[i].re,' ');}}
+  var ctm=[{re:/мюнхен|münchen|munich/i,val:'munich',label:'Мюнхен'},{re:/берлин|berlin/i,val:'berlin',label:'Берлин'},{re:/гейдельберг|heidelberg/i,val:'heidelberg',label:'Гейдельберг'},{re:/\bбонн\b|bonn/i,val:'bonn',label:'Бонн'},{re:/тюбинг\w*|tuebingen/i,val:'tuebingen',label:'Тюбинген'},{re:/дрезден|dresden/i,val:'dresden',label:'Дрезден'},{re:/карлсруэ|karlsruhe/i,val:'karlsruhe',label:'Карлсруэ'},{re:/аахен|aachen/i,val:'aachen',label:'Аахен'},{re:/гамбург|hamburg/i,val:'hamburg',label:'Гамбург'},{re:/кёльн|кельн|cologne/i,val:'cologne',label:'Кёльн'},{re:/франкфурт|frankfurt/i,val:'frankfurt',label:'Франкфурт'},{re:/фрайбург|freiburg/i,val:'freiburg',label:'Фрайбург'}];
+  for(var i=0;i<ctm.length;i++){if(ctm[i].re.test(lo)){filters.push({label:ctm[i].label,type:'city',value:ctm[i].val});rest=rest.replace(ctm[i].re,' ');}}
+  if(/\bангл\w*|\bengl\w*|english/i.test(lo)){filters.push({label:'Есть англ.',type:'eng',value:true});rest=rest.replace(/\bангл\w*|\bengl\w*|english/gi,' ');}
+  if(/стипенд\w*|scholarship/i.test(lo)){filters.push({label:'Стипендия',type:'tag',value:'scholarship'});rest=rest.replace(/стипенд\w*|scholarship/gi,' ');}
+  var leftover=rest.replace(/[,+\s]+/g,' ').trim();
+  return {filters:filters, budget:budget, leftover:leftover};
 }
 
 function applyF(e,filters,budget) {
@@ -320,7 +322,7 @@ var AF=[], AB=null;
 function renderTags(){var c=document.getElementById('ftags');if(!AF.length&&!AB){c.innerHTML='';return;}c.innerHTML=AF.map(function(f,i){return'<span class="ftag">'+f.label+' <span class="ftag-x" onclick="rmF('+i+')">×</span></span>';}).join('');}
 function rmF(i){AF.splice(i,1);AB=null;renderTags();doSearch();}
 function textMatch(e,lo){var cn=(CITIES[e.city]||{}).n||'';var hay=[e.uni,e.sub,e.city,cn,(e.tags||[]).join(' ')].join(' ').toLowerCase();return hay.indexOf(lo)>-1;}
-function doSearch(){var q=document.getElementById('q').value.trim();if(!q){AF=[];AB=null;renderTags();rebuild(null,null);return;}var p=parseQ(q);AF=p.filters;AB=p.budget;renderTags();if(AF.length>0||AB!==null){rebuild(function(e){return applyF(e,AF,AB);},null);}else{var lo=q.toLowerCase();rebuild(function(e){return textMatch(e,lo);},null);}}
+function doSearch(){var q=document.getElementById('q').value.trim();if(!q){AF=[];AB=null;renderTags();rebuild(null,null);return;}var p=parseQ(q);AF=p.filters;AB=p.budget;renderTags();var lo=p.leftover;var hasF=AF.length>0||AB!==null;var hasT=lo.length>1;if(hasF&&hasT){rebuild(function(e){return applyF(e,AF,AB)&&textMatch(e,lo);},null);}else if(hasF){rebuild(function(e){return applyF(e,AF,AB);},null);}else if(hasT){rebuild(function(e){return textMatch(e,lo);},null);}else{rebuild(null,null);}}
 
 function rws(arr,col){return(arr||[]).map(function(x){return'<div class="row"'+(col?' style="color:'+col+'"':'')+'>'+x+'</div>';}).join('');}
 function mbd(arr){return(arr||[]).map(function(x){return'<span class="bdg" style="background:#222;color:#888;margin:2px 2px 0 0">'+x+'</span>';}).join('');}
