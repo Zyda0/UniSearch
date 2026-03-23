@@ -113,7 +113,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="tab" onclick="swV('uni',this)">По вузам</div>
   </div>
   <div class="search-wrap">
-    <input id="q" placeholder="Поиск... (медицина, 800 евро, хорошие шансы)" oninput="onIn(this.value)">
+    <input id="q" placeholder="Поиск... (TU München, медицина, 800 евро, Берлин)" oninput="onIn(this.value)">
     <button class="ai-btn" id="aibtn" onclick="togAI()">✦ AI</button>
     <button class="send-btn" id="sbtn" onclick="sendAI()">↵</button>
   </div>
@@ -202,7 +202,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 <script>
 var G = { lang:'ruku', ai:false, timer:null, admin:false };
-var HINTS = { ruku:'Пример: медицина 800 евро, хорошие шансы + Берлин', deen:'Beispiel: Medizin 800 Euro, gute Chancen, Berlin' };
+var HINTS = { ruku:'Пример: TU München, медицина, 800 евро Берлин, хорошие шансы', deen:'Beispiel: TU München, Medizin, 800 Euro Berlin, gute Chancen' };
 var AHINTS = { ruku:'✦ AI включён — опишите клиента и нажмите ↵', deen:'✦ AI on — describe client and press ↵' };
 var CCOST = { munich:1400,berlin:1200,heidelberg:950,bonn:900,tuebingen:750,dresden:750,karlsruhe:900,aachen:850,hamburg:1200,cologne:950,frankfurt:1300,freiburg:900 };
 var CITIES = {
@@ -319,7 +319,8 @@ function applyF(e,filters,budget) {
 var AF=[], AB=null;
 function renderTags(){var c=document.getElementById('ftags');if(!AF.length&&!AB){c.innerHTML='';return;}c.innerHTML=AF.map(function(f,i){return'<span class="ftag">'+f.label+' <span class="ftag-x" onclick="rmF('+i+')">×</span></span>';}).join('');}
 function rmF(i){AF.splice(i,1);AB=null;renderTags();doSearch();}
-function doSearch(){var q=document.getElementById('q').value.trim();if(!q){AF=[];AB=null;renderTags();rebuild(null,null);return;}var p=parseQ(q);AF=p.filters;AB=p.budget;renderTags();if(AF.length>0||AB!==null){rebuild(function(e){return applyF(e,AF,AB);},null);}else{rebuild(null,null);}}
+function textMatch(e,lo){var cn=(CITIES[e.city]||{}).n||'';var hay=[e.uni,e.sub,e.city,cn,(e.tags||[]).join(' ')].join(' ').toLowerCase();return hay.indexOf(lo)>-1;}
+function doSearch(){var q=document.getElementById('q').value.trim();if(!q){AF=[];AB=null;renderTags();rebuild(null,null);return;}var p=parseQ(q);AF=p.filters;AB=p.budget;renderTags();if(AF.length>0||AB!==null){rebuild(function(e){return applyF(e,AF,AB);},null);}else{var lo=q.toLowerCase();rebuild(function(e){return textMatch(e,lo);},null);}}
 
 function rws(arr,col){return(arr||[]).map(function(x){return'<div class="row"'+(col?' style="color:'+col+'"':'')+'>'+x+'</div>';}).join('');}
 function mbd(arr){return(arr||[]).map(function(x){return'<span class="bdg" style="background:#222;color:#888;margin:2px 2px 0 0">'+x+'</span>';}).join('');}
