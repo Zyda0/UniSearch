@@ -302,6 +302,7 @@ function parseQ(q) {
   if(/\bангл\w*|\bengl\w*|english/i.test(lo)){filters.push({label:'Есть англ.',type:'eng',value:true});rest=rest.replace(/\bангл\w*|\bengl\w*|english/gi,' ');}
   if(/стипенд\w*|scholarship/i.test(lo)){filters.push({label:'Стипендия',type:'tag',value:'scholarship'});rest=rest.replace(/стипенд\w*|scholarship/gi,' ');}
   var leftover=rest.replace(/[,+\s]+/g,' ').trim();
+  if(filters.length===0&&budget===null&&q.trim().length>1){filters.push({label:q.trim(),type:'name',value:q.trim().toLowerCase()});}
   return {filters:filters, budget:budget, leftover:leftover};
 }
 
@@ -314,6 +315,7 @@ function applyF(e,filters,budget) {
     if(f.type==='tag'&&(e.tags||[]).indexOf(f.value)<0)return false;
     if(f.type==='city'&&e.city!==f.value)return false;
     if(f.type==='eng'&&!e.eng)return false;
+    if(f.type==='name'&&e.uni.toLowerCase().indexOf(f.value)<0)return false;
   }
   return true;
 }
