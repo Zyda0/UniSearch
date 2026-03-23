@@ -20,24 +20,38 @@ export default async function handler(req, res) {
 
   if (!userMessage.trim()) return res.status(400).json({ error: 'userMessage пустой' });
 
-  try {
-    const groqResp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [{ role: 'user', content: system + '\n\nЗапрос клиента: ' + userMessage }],
-        temperature: 0.2,
-        max_tokens: 4000
-      })
-    });
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-    const groqData = await groqResp.json().catch(() => null);
+  try {
+    let groqResp, groqData;
+
+    for (let attempt = 0; attempt <= 2; attempt++) {
+      groqResp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [{ role: 'user', content: system + '\n\nЗапрос клиента: ' + userMessage }],
+          temperature: 0.2,
+          max_tokens: 4000
+        })
+      });
+      groqData = await groqResp.json().catch(() => null);
+
+      if (groqResp.status !== 429 && groqResp.status !== 503) break;
+      if (attempt < 2) await sleep(2000 * Math.pow(2, attempt));
+    }
 
     if (!groqResp.ok) {
+      if (groqResp.status === 429) {
+        return res.status(429).json({ error: 'Лимит запросов к AI исчерпан. Попробуйте через несколько минут.', isQuotaError: true });
+      }
+      if (groqResp.status === 503) {
+        return res.status(503).json({ error: 'AI сервис временно недоступен. Попробуйте через минуту.', isQuotaError: true });
+      }
       const msg = groqData?.error?.message || ('Groq статус ' + groqResp.status);
       return res.status(500).json({ error: msg });
     }
