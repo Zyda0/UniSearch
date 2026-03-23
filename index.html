@@ -340,12 +340,9 @@ function mkCard(e,sc,ai){
 }
 
 function bDir(fn,am){
-  var dirData=DATA.slice();
-  if(am){dirData.sort(function(a,b){var pa=a.entries.reduce(function(m,e){var ai=am[e.uni+'::'+a.dir];return ai&&!ai.isNo?Math.min(m,ai.p||99):m;},99);var pb=b.entries.reduce(function(m,e){var ai=am[e.uni+'::'+b.dir];return ai&&!ai.isNo?Math.min(m,ai.p||99):m;},99);return pa-pb;});}
   var h='';
-  for(var i=0;i<dirData.length;i++){
-
-    var d=dirData[i];
+  for(var i=0;i<DATA.length;i++){
+    var d=DATA[i];
     var ents=fn?d.entries.filter(fn):d.entries.slice();
     if(am){ents=d.entries.slice();ents.sort(function(a,b){var ka=a.uni+'::'+d.dir,kb=b.uni+'::'+d.dir;var da=am[ka]||null,db=am[kb]||null;var pa=da&&!da.isNo?da.p:50,pb=db&&!db.isNo?db.p:50;var na=da&&da.isNo?1:0,nb=db&&db.isNo?1:0;return(na-nb)||(pa-pb);});}
     if(!ents.length)continue;
@@ -361,10 +358,8 @@ function bDir(fn,am){
 function bCity(fn,am){
   var bC={};
   for(var i=0;i<DATA.length;i++){for(var j=0;j<DATA[i].entries.length;j++){var e=DATA[i].entries[j];var ai=am?(am[e.uni+'::'+DATA[i].dir]||null):null;if(fn&&!fn(e))continue;if(am&&!ai)continue;if(!bC[e.city])bC[e.city]=[];bC[e.city].push({e:Object.assign({},e,{_d:DATA[i].dir}),ai:ai});}}
-  var cityOrder=CORD.slice();
-  if(am){cityOrder.sort(function(a,b){var ra=bC[a]?bC[a].reduce(function(m,x){return x.ai&&!x.ai.isNo?Math.min(m,x.ai.p||99):m;},99):99;var rb=bC[b]?bC[b].reduce(function(m,x){return x.ai&&!x.ai.isNo?Math.min(m,x.ai.p||99):m;},99):99;return ra-rb;});}
   var h='';
-  for(var i=0;i<cityOrder.length;i++){var cid=cityOrder[i];if(!bC[cid]||!bC[cid].length)continue;var city=CITIES[cid];var sorted=bC[cid].slice().sort(function(a,b){if(am){var pa=a.ai&&!a.ai.isNo?a.ai.p:50,pb=b.ai&&!b.ai.isNo?b.ai.p:50;return pa-pb;}return SV[a.e.st]-SV[b.e.st];});var o=fn||am?'open':'';var cards=sorted.map(function(x,idx){return mkCard(Object.assign({},x.e,{rank:idx+1}),false,x.ai);}).join('');h+='<div class="sh" onclick="togS(this)"><span class="st">'+city.n+'</span><span class="sm">'+city.l+' · <span style="color:'+CC[city.c]+'">'+city.cl+'</span></span><span class="chev '+o+'">▼</span></div><div class="sb '+o+'">'+cards+'</div>';}
+  for(var i=0;i<CORD.length;i++){var cid=CORD[i];if(!bC[cid]||!bC[cid].length)continue;var city=CITIES[cid];var sorted=bC[cid].slice().sort(function(a,b){if(am){var pa=a.ai&&!a.ai.isNo?a.ai.p:50,pb=b.ai&&!b.ai.isNo?b.ai.p:50;return pa-pb;}return SV[a.e.st]-SV[b.e.st];});var o=fn||am?'open':'';var cards=sorted.map(function(x,idx){return mkCard(Object.assign({},x.e,{rank:idx+1}),false,x.ai);}).join('');h+='<div class="sh" onclick="togS(this)"><span class="st">'+city.n+'</span><span class="sm">'+city.l+' · <span style="color:'+CC[city.c]+'">'+city.cl+'</span></span><span class="chev '+o+'">▼</span></div><div class="sb '+o+'">'+cards+'</div>';}
   document.getElementById('vcity').innerHTML=h||'<div class="empty">Ничего не найдено</div>';
 }
 
@@ -387,24 +382,8 @@ function onIn(v){if(G.ai){clearTimeout(G.timer);return;}clearTimeout(G.timer);G.
 function togAI(){G.ai=!G.ai;var btn=document.getElementById('aibtn'),sb=document.getElementById('sbtn'),h=document.getElementById('hint'),bar=document.getElementById('aibar'),inp=document.getElementById('q');if(G.ai){btn.classList.add('active');btn.textContent='✦ AI';sb.classList.add('visible');h.textContent=AHINTS[G.lang];h.className='hint ai-mode';inp.placeholder='Опишите клиента...';inp.focus();}else{btn.classList.remove('active');btn.textContent='✦ AI';sb.classList.remove('visible');h.textContent=HINTS[G.lang];h.className='hint';bar.style.display='none';inp.placeholder='Поиск... (медицина, 800 евро, хорошие шансы)';var q=inp.value;if(q.trim())doSearch();else rebuild(null,null);}}
 function sendAI(){var v=document.getElementById('q').value.trim();if(v.length>2)runAI(v);}
 
-var AI_CACHE=new Map();
-
 async function runAI(query) {
   var btn=document.getElementById('aibtn'), sb=document.getElementById('sbtn'), bar=document.getElementById('aibar');
-
-  var cacheKey=query.trim().toLowerCase();
-  if(AI_CACHE.has(cacheKey)){
-    var cached=AI_CACHE.get(cacheKey);
-    if(cached.summary){bar.innerHTML='<strong>Анализ:</strong> '+cached.summary;bar.style.color='#5bb3d0';bar.style.display='block';}
-    var am={};
-    (cached.top||[]).forEach(function(x){am[x.id]={isNo:false,p:x.p||1,reason:x.reason||'',warning:x.warning||null};});
-    (cached.no||[]).forEach(function(x){am[x.id]={isNo:true,p:99,noR:x.reason||''};});
-    rebuild(null,am);
-    btn.classList.add('active'); btn.textContent='✦ AI';
-    sb.textContent='↵'; sb.style.pointerEvents='';
-    return;
-  }
-
   btn.innerHTML='<span class="dots"><span></span><span></span><span></span></span>';
   sb.textContent='…'; sb.style.pointerEvents='none';
   bar.style.display='none';
@@ -417,37 +396,29 @@ async function runAI(query) {
     'chance: low=низкие шансы, mid=средние, hi=высокие. status: e=элитный, t=технический, s=сильный. eng=true есть англ.программы. '+
     'Подбери варианты под клиента. Верни ТОЛЬКО JSON без markdown: '+
     '{"summary":"1-2 предложения","top":[{"id":"uni::dir","p":1,"reason":"почему подходит","warning":null}],"no":[{"id":"uni::dir","reason":"почему нет"}]} '+
-    'p:1=отлично,2=с оговорками,3=возможный. Макс 5 в top, 2 в no. id точно как в каталоге.';
+    'p:1=отлично,2=с оговорками,3=возможный. Верни ВСЕ подходящие варианты в top (без лимита), только явно неподходящие в no (макс 3). id точно как в каталоге.';
 
   try {
     var resp=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:sys,userMessage:query})});
-    if(!resp.ok){
-      var ed=await resp.json().catch(function(){return{};});
-      if(resp.status===429||ed.isQuotaError){
-        throw new Error('Лимит AI исчерпан — попробуйте через несколько минут');
-      }
-      throw new Error(ed.error||'Сервер '+resp.status);
-    }
+    if(!resp.ok){var ed=await resp.json().catch(function(){return{};});throw new Error(ed.error||'Сервер '+resp.status);}
     var data=await resp.json();
     if(data.error)throw new Error(data.error);
     var raw=data.text||'';
     var fi=raw.indexOf('{'),la=raw.lastIndexOf('}');
     if(fi===-1||la===-1)throw new Error('AI не вернул JSON');
     var parsed=JSON.parse(raw.slice(fi,la+1));
-    AI_CACHE.set(cacheKey,parsed);
     if(parsed.summary){bar.innerHTML='<strong>Анализ:</strong> '+parsed.summary;bar.style.color='#5bb3d0';bar.style.display='block';}
     var am={};
     (parsed.top||[]).forEach(function(x){am[x.id]={isNo:false,p:x.p||1,reason:x.reason||'',warning:x.warning||null};});
     (parsed.no||[]).forEach(function(x){am[x.id]={isNo:true,p:99,noR:x.reason||''};});
     rebuild(null,am);
   } catch(err) {
-    bar.textContent='⚠ '+(err.message||'Ошибка AI, попробуйте снова');
+    bar.textContent='⚠ Ошибка AI: '+(err.message||'попробуйте снова');
     bar.style.color='#c84a4a'; bar.style.display='block';
   }
   btn.classList.add('active'); btn.textContent='✦ AI';
   sb.textContent='↵'; sb.style.pointerEvents='';
 }
-
 
 function openAdmin(open){document.getElementById('adminPanel').classList.toggle('open',!!open);}
 function showAdminForm(){document.getElementById('adminLogin').classList.remove('open');document.getElementById('adminForm').classList.add('open');document.getElementById('adminStatus').textContent='Доступ открыт.';renderAdminList();}
